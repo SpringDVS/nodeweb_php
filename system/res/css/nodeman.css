@@ -1,0 +1,61 @@
+body {
+    background-image: url('/system/res/img/shattered.png');
+    color: #2F2F2F;
+}
+#header-block {
+   background: #4F4F4F;
+   background: #7F4B7B;
+   color: #EFEFEF;
+   margin-bottom: 15px;
+   min-height: 5px;
+}
+
+#header-block h4 {
+    margin: 10px;
+}
+
+div[class ^= "pure-u-"] {
+    float: left;
+}
+div[class ^= "pure-u-"] > div {
+    margin: 10px;
+}
+
+.pure-g section {
+    width: 100%;
+    overflow: auto;
+}
+
+main h1 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 18pt;
+    margin-left: 20px;
+}
+
+#logo {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    z-index: -1024;
+    
+    
+}
+
+div.white-container {
+    background-color: rgba(247,247,247,0.7);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+div.raised {
+-moz-box-shadow: 0 0 10px #9c9c9c;
+-webkit-box-shadow: 0 0 10px #9c9c9c;
+box-shadow: 0 0 10px #9c9c9c;
+}
+
+div.white-container h3 {
+    margin-top: 0px;
+    width: 100%;
+    border-bottom: 2px solid #D3D5D5;
+}
