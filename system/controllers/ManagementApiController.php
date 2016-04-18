@@ -33,6 +33,9 @@ class ManagementApiController {
 			'hostname' => \SpringDvs\Config::$spec['hostname'],
 			'service' => \SpringDvs\Config::$net['service'],
 			'address' => $_SERVER['SERVER_ADDR'],
+			
+			'master_addr' => \SpringDvs\Config::$net['master'],
+			'geosub' => 'esusx.uk',
 		);
 	}
 	
