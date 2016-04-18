@@ -13,4 +13,3 @@ include 'system/routes.php';
 include 'system/config.php';
 
 Flight::start();
-
