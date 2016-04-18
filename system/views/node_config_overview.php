@@ -4,11 +4,14 @@
 	
 	<div class="white-container raised">
 		<h3>Tasks</h3>
+		<button>Bring Online</button>
 	</div>
 	
 </div>
 
 <div class="pure-u-2-5">
+	<div class="pure-1-1">
+	
 	<div class="white-container raised">
 		<h3>Node Details</h3>
 		<table class="pure-table pure-table-bordered">
@@ -32,6 +35,29 @@
 		</tbody>
 		</table>
 	</div>
+		
+	<div class="white-container raised">
+		<h3>Network Details</h3>
+		<table class="pure-table pure-table-bordered">
+		<tbody>
+			<tr>
+				<td><strong>GSN:</strong></td>
+				<td data-bind="text: geosub"></td>
+			</tr>
+			<tr>
+				<td><strong>Master Address:</strong></td>
+				<td data-bind="text: master_addr"></td>
+			</tr>
+			<tr>
+				<td><strong>Status:</strong></td>
+				<td data-bind="">offline</td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
+		
+	</div>
 </div>
 	
 </section>
+
