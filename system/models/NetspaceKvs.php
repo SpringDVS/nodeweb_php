@@ -132,19 +132,51 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	}
 
 	public function gtnGeosubRegister($node, $geosub) {
+		$key = $node->springname() ."__".$geosub;
+		if($this->geotopNetspace->get($key) !== false)
+			return false; 
+ 
+		$nodeArray = array(
+			'hostname' => $node->toHostResource(),
+			'address' => SpringDvs\Node::addressToString($node->address()),
+			'service' => $node->service(),
+			'priority' => SpringDvs\DvspNodeState::disabled,
+			'geosub' => $geosub,
+		);
 		
+		$this->geotopNetspace->set($key, $nodeArray);		
 	}
 
 	public function gtnGeosubUnregister($node, $geosub) {
+
+		$key = $node->springname() ."__".$geosub;
+
+		if($this->geotopNetspace->get($key) === false)
+			return false; 
 		
+		$this->geotopNetspace->delete($key);
 	}
 
 	public function gtnGeosubRootNodes($geosub) {
-		
+
+		$list = array();
+
+		foreach($this->geotopNetspace->getKeys() as $k) {
+			$v = $this->geotopNetspace->get($k);
+			if($v['geosub'] == $geosub)
+				$list[] = $this->constructRootNode($k, $v);
+		}
+
+		return $list;
 	}
 
 	public function gtnGeosubNodeBySpringname($springname, $geosub) {
+		$key = $springname ."__".$geosub;
+		$v = $this->geotopNetspace->get($key);
+		if($v === false)
+			return false; 
 		
+		return $this->constructRootNode($springname, $v);		
 	}
 	
 	public function &dbGsn() {
@@ -163,6 +195,18 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 				$details['service'],
 				$details['status'],
 				$details['types']
+		);
+	}
+	
+	private function constructRootNode($springname, $details) {
+		$vals = explode("__", $springname);
+		return new SpringDvs\Node(
+				$vals[0], 
+				$details['hostname'],
+				SpringDvs\Node::addressFromString($details['address']),
+				$details['service'],
+				SpringDvs\DvspNodeState::unspecified,
+				SpringDvs\DvspNodeType::undefined
 		);
 	}
 }

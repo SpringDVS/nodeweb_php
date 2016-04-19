@@ -250,7 +250,7 @@ class DvspNetspaceKvsTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('spring', $nodes[0]->springname());
 		$this->assertEquals('host', $nodes[0]->hostname());
-		$this->assertEquals(array(127,0,1,2), $nodes[0]->address());
+		$this->assertEquals([127,0,1,2], $nodes[0]->address());
 
 		$this->assertEquals('spring2', $nodes[1]->springname());
 		$this->assertEquals('host2', $nodes[1]->hostname());
@@ -372,7 +372,7 @@ class DvspNetspaceKvsTest extends PHPUnit_Framework_TestCase {
 		$this->reset($store->dbGsn());
 	}
 	
-	public function testNetsapceKvsNodesPass() {
+	public function testNetspaceKvsNodesPass() {
 		$store = $this->netspace();
 
 		$store->gsnNodeRegister(new SpringDvs\Node("spring", "host", [127,0,1,2], 
@@ -396,5 +396,158 @@ class DvspNetspaceKvsTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('host2', $nodes[1]->hostname());
 		$this->assertEquals(array(127,0,1,3), $nodes[1]->address());
 		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsGtnNodeRegisterPass() {
+		$store = $this->netspace();
+
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		$v = $store->dbGtn()->get('spring__esusx');
+		$this->assertTrue(is_array($v));
+		
+		$this->assertEquals('host', $v['hostname']);
+		$this->assertEquals('127.0.1.2', $v['address']);
+		$this->assertEquals('esusx', $v['geosub']);
+		$this->reset($store->dbGtn());
+	}
+	
+	public function testNetspaceKvsGtnNodeRegisterFail() {
+		$store = $this->netspace();
+
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+
+		$v = $store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		$this->assertFalse($v);
+	}
+
+	public function testNetspaceKvsGtnNodeUnregisterPass() {
+		$store = $this->netspace();
+
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		
+		$this->assertTrue(is_array($store->dbGtn()->get('spring__esusx')));
+		
+		$store->gtnGeosubUnregister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		$this->assertFalse($store->dbGtn()->get('spring__esusx'));
+	}
+	
+	public function testNetspaceKvsGtnNodeUnregisterFail() {
+		$store = $this->netspace();
+
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		
+		$this->assertTrue(is_array($store->dbGtn()->get('spring__esusx')));
+		
+		$v = $store->gtnGeosubUnregister(
+				SpringDvs\Node::from_nodestring("void,host,127.0.1.2"), 
+				'esusx'
+			);
+		$this->assertFalse($v);
+	}
+
+	public function testNetspaceKvsGtnNodeFromSpringnamePass() {
+		$store = $this->netspace();
+
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		
+		$node = $store->gtnGeosubNodeBySpringname('spring', 'esusx');
+		
+		$this->assertFalse($node === false);
+		
+		$this->reset($store->dbGtn());
+	}
+
+	public function testNetspaceKvsGtnNodeFromSpringnameFail() {
+		$store = $this->netspace();
+
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		
+		$node = $store->gtnGeosubNodeBySpringname('void', 'esusx');
+		
+		$this->assertFalse($node);
+		
+		$this->reset($store->dbGtn());
+	}
+	
+	public function testNetspaceKvsGtnGeosubRootNodesPass() {
+		$store = $this->netspace();
+
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring2,host2,127.0.1.3"), 
+				'esusx'
+			);
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring3,host3,127.0.1.4"), 
+				'wsusx'
+			);
+		
+		$nodes = $store->gtnGeosubRootNodes('esusx');
+		
+		$this->assertEquals(2, count($nodes));
+
+		$this->assertEquals('spring', $nodes[0]->springname());
+		$this->assertEquals('host', $nodes[0]->hostname());
+		$this->assertEquals([127,0,1,2], $nodes[0]->address());
+		
+		$this->assertEquals('spring2', $nodes[1]->springname());
+		$this->assertEquals('host2', $nodes[1]->hostname());		
+		$this->assertEquals([127,0,1,3], $nodes[1]->address());
+		
+		$nodesB = $store->gtnGeosubRootNodes('wsusx');
+		$this->assertEquals(1, count($nodesB));
+
+		$this->assertEquals('spring3', $nodesB[0]->springname());
+		$this->assertEquals('host3', $nodesB[0]->hostname());
+		$this->assertEquals([127, 0, 1, 4], $nodesB[0]->address());
+		$this->reset($store->dbGtn());
+	}
+	
+	public function testNetspaceKvsGtnGeosubRootNodesFail() {
+		$store = $this->netspace();
+
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"), 
+				'esusx'
+			);
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring2,host2,127.0.1.3"), 
+				'esusx'
+			);
+		$store->gtnGeosubRegister(
+				SpringDvs\Node::from_nodestring("spring3,host3,127.0.1.4"), 
+				'wsusx'
+			);
+
+		$nodes = $store->gtnGeosubRootNodes('surry');
+		$this->assertEquals(0, count($nodes));
+		$this->reset($store->dbGtn());
 	}
 }
