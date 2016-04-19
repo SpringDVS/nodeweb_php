@@ -1,0 +1,400 @@
+<?php
+include '../vendor/autoload.php';
+include '../system/models/NetspaceKvs.php';
+
+class DvspNetspaceKvsTest extends PHPUnit_Framework_TestCase {
+	private function netspace() {
+		
+		$db = new NetspaceKvs(true, '../system/store/testunit/');
+		$this->reset($db->dbGsn());
+		$this->reset($db->dbGtn());
+		return $db;
+	}
+	
+	private function reset(&$db) {
+		try {
+			unlink($db->getDatabase()->getPath());
+		} catch(Exception $e) { }
+	}
+	
+	public function testNetspaceKvsRegister() {
+		$store = $this->netspace();
+		$node = new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org);
+		
+		$store->gsnNodeRegister($node);
+		
+		$kvs = $store->dbGsn()->get('spring');
+		
+		$this->assertTrue(is_array($kvs));
+		$this->assertEquals('host', $kvs['hostname']);
+		$this->assertEquals('127.0.1.2', $kvs['address']);
+		$this->assertEquals(SpringDvs\DvspService::http, $kvs['service']);
+		$this->assertEquals(SpringDvs\DvspNodeState::disabled, $kvs['status']);
+		$this->assertEquals(SpringDvs\DvspNodeType::org, $kvs['types']);
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsRegisterWithResource() {
+		$store = $this->netspace();
+		$node = new SpringDvs\Node("spring", "host/res/", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::disabled, 
+									SpringDvs\DvspNodeType::org);
+		
+		$store->gsnNodeRegister($node);
+		
+		$kvs = $store->dbGsn()->get('spring');
+		
+		$this->assertTrue(is_array($kvs));
+		$this->assertEquals('host/res/', $kvs['hostname']);
+		$this->assertEquals('127.0.1.2', $kvs['address']);
+		$this->assertEquals(SpringDvs\DvspService::http, $kvs['service']);
+		$this->assertEquals(SpringDvs\DvspNodeState::disabled, $kvs['status']);
+		$this->assertEquals(SpringDvs\DvspNodeType::org, $kvs['types']);
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsRegisterFail() {
+		$store = $this->netspace();
+		$node = new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::disabled, 
+									SpringDvs\DvspNodeType::org);
+		
+		$store->gsnNodeRegister($node);
+		
+		$this->assertFalse($store->gsnNodeRegister($node));
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsUnregisterPass() {
+		$store = $this->netspace();
+		$node = SpringDvs\Node::from_nodestring("spring,host,127.0.1.2");
+		$store->gsnNodeRegister($node);
+		
+		$this->assertTrue(is_array($store->dbGsn()->get('spring')));
+		
+		$store->gsnNodeUnregister($node);
+		$this->assertFalse($store->dbGsn()->get('spring'));
+		$this->reset($store->dbGsn());
+	}
+
+	public function testNetspaceKvsUnregisterFail() {
+		$store = $this->netspace();
+		$node = SpringDvs\Node::from_nodestring("spring2,host2,127.0.1.3");
+		$store->gsnNodeRegister(SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"));
+			
+		$this->assertFalse($store->gsnNodeUnregister($node));
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodeBySpringnamePass() {
+		$store = $this->netspace();
+		$store->gsnNodeRegister(SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"));
+		
+		$node = $store->gsnNodeBySpringName('spring');
+		$this->assertFalse($node === false);
+		$this->assertEquals('spring', $node->springname());
+		$this->assertEquals('host', $node->hostname());
+		$this->assertEquals(array(127,0,1,2), $node->address());
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodeBySpringnameFail() {
+		$store = $this->netspace();
+		$store->gsnNodeRegister(SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"));
+		
+		$node = $store->gsnNodeBySpringName('void');
+		$this->assertFalse($node);
+		$this->reset($store->dbGsn());
+		
+	}
+
+	public function testNetspaceKvsNodeByHostnamePass() {
+		$store = $this->netspace();
+		$store->gsnNodeRegister(SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"));
+		
+		$node = $store->gsnNodeByHostname('host');
+		$this->assertFalse($node === false);
+		$this->assertEquals('spring', $node->springname());
+		$this->assertEquals('host', $node->hostname());
+		$this->assertEquals(array(127,0,1,2), $node->address());
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodeByHostnameFail() {
+		$store = $this->netspace();
+		$store->gsnNodeRegister(SpringDvs\Node::from_nodestring("spring,host,127.0.1.2"));
+		
+		$node = $store->gsnNodeByHostname('void');
+		$this->assertFalse($node);
+		$this->reset($store->dbGsn());
+	}
+
+	public function testNetsapceKvsNodeUpdatePass() {
+		$store = $this->netspace();
+		$node = SpringDvs\Node::from_nodestring("spring,host,127.0.1.2");
+		
+		$store->gsnNodeRegister($node);
+		$this->assertEquals(SpringDvs\DvspNodeState::disabled, 
+							$store->gsnNodeBySpringName("spring")->state());
+		
+		$node->updateState(SpringDvs\DvspNodeState::enabled);
+		$store->gsnNodeUpdate($node);
+
+		$this->assertEquals(SpringDvs\DvspNodeState::enabled, 
+							$store->gsnNodeBySpringName("spring")->state());
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodeByStatePass() {
+		$store = $this->netspace();
+		$nodeA = new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org);
+		
+		$store->gsnNodeRegister($nodeA);
+		$store->gsnNodeUpdate($nodeA);
+		
+
+		$nodeB = new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org);
+		$store->gsnNodeRegister($nodeB);
+		$store->gsnNodeUpdate($nodeB);
+		
+		$nodeC = new SpringDvs\Node("spring3", "host3", [127,0,1,4], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::unresponsive, 
+									SpringDvs\DvspNodeType::org);
+		$store->gsnNodeRegister($nodeC);
+		$store->gsnNodeUpdate($nodeC);	
+		
+		$nodes = $store->gsnNodesByState(SpringDvs\DvspNodeState::enabled);
+		$this->assertEquals(2, count($nodes));
+
+		$this->assertEquals('spring', $nodes[0]->springname());
+		$this->assertEquals('host', $nodes[0]->hostname());
+		$this->assertEquals(array(127,0,1,2), $nodes[0]->address());
+
+		$this->assertEquals('spring2', $nodes[1]->springname());
+		$this->assertEquals('host2', $nodes[1]->hostname());
+		$this->assertEquals(array(127,0,1,3), $nodes[1]->address());
+
+		$unnodes = $store->gsnNodesByState(SpringDvs\DvspNodeState::unresponsive);
+		
+		$this->assertEquals(1, count($unnodes));
+
+		$this->assertEquals('spring3', $unnodes[0]->springname());
+		$this->assertEquals('host3', $unnodes[0]->hostname());
+		$this->assertEquals(array(127,0,1,4), $unnodes[0]->address());
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodeByStateFail() {
+		$store = $this->netspace();
+		
+		$nodeA = new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org);
+		
+		$store->gsnNodeRegister($nodeA);
+		$store->gsnNodeUpdate($nodeA);
+		
+
+		$nodeB = new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org);
+		$store->gsnNodeRegister($nodeB);
+		$store->gsnNodeUpdate($nodeB);
+		
+		$nodeC = new SpringDvs\Node("spring3", "host3", [127,0,1,4], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::unresponsive, 
+									SpringDvs\DvspNodeType::org);
+		$store->gsnNodeRegister($nodeC);
+		$store->gsnNodeUpdate($nodeC);	
+		
+		$nodes = $store->gsnNodesByState(SpringDvs\DvspNodeState::disabled);
+		$this->assertTrue(empty($nodes));
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodesByTypesPass() {
+			
+		$store = $this->netspace();
+		$store->gsnNodeRegister(new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+
+		$store->gsnNodeRegister(new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+		
+		$store->gsnNodeRegister(new SpringDvs\Node("spring3", "host3", [127,0,1,4], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::unresponsive, 
+									SpringDvs\DvspNodeType::root));
+		
+		$nodes = $store->gsnNodesByType(SpringDvs\DvspNodeType::org);
+		$this->assertEquals(2, count($nodes));
+
+		$this->assertEquals('spring', $nodes[0]->springname());
+		$this->assertEquals('host', $nodes[0]->hostname());
+		$this->assertEquals(array(127,0,1,2), $nodes[0]->address());
+
+		$this->assertEquals('spring2', $nodes[1]->springname());
+		$this->assertEquals('host2', $nodes[1]->hostname());
+		$this->assertEquals(array(127,0,1,3), $nodes[1]->address());
+
+		$unnodes = $store->gsnNodesByType(SpringDvs\DvspNodeType::root);
+		
+		$this->assertEquals(1, count($unnodes));
+
+		$this->assertEquals('spring3', $unnodes[0]->springname());
+		$this->assertEquals('host3', $unnodes[0]->hostname());
+		$this->assertEquals(array(127,0,1,4), $unnodes[0]->address());
+		$this->reset($store->dbGsn());		
+	}
+	
+	public function testNetspaceKvsNodesByTypesFail() {
+			
+		$store = $this->netspace();
+		$store->gsnNodeRegister(new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+
+		$store->gsnNodeRegister(new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+		
+		$store->gsnNodeRegister(new SpringDvs\Node("spring3", "host3", [127,0,1,4], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::unresponsive, 
+									SpringDvs\DvspNodeType::root));
+		$nodes = $store->gsnNodesByType(SpringDvs\DvspNodeType::undefined);	
+		$this->assertEquals(0, count($nodes));
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodesByAddressArrayPass() {
+			
+		$store = $this->netspace();
+
+		$store->gsnNodeRegister(new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+		
+		$store->gsnNodeRegister(new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+
+		$node = $store->gsnNodesByAddress([127,0,1,2]);
+		
+		$this->assertFalse($node === false);
+		$this->assertEquals('spring', $node->springname());
+		
+		$this->reset($store->dbGsn());
+	}
+
+	public function testNetspaceKvsNodesByAddressStringPass() {
+			
+		$store = $this->netspace();
+		$store->gsnNodeRegister(new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+		
+		$store->gsnNodeRegister(new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+
+		$node = $store->gsnNodesByAddress("127.0.1.3");
+		
+		$this->assertFalse($node === false);
+		$this->assertEquals('spring2', $node->springname());
+		
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodesByAddressArrayFail() {
+			
+		$store = $this->netspace();
+
+		$store->gsnNodeRegister(new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+		
+		$store->gsnNodeRegister(new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+
+		$node = $store->gsnNodesByAddress([127,0,1,4]);
+		
+		$this->assertFalse($node);
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetspaceKvsNodesByAddressStringFail() {
+			
+		$store = $this->netspace();
+
+		$store->gsnNodeRegister(new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+		
+		$store->gsnNodeRegister(new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+
+		$node = $store->gsnNodesByAddress("127.0.1.4");
+		$this->assertFalse($node);
+		$node = $store->gsnNodesByAddress("127.0.1");
+		$this->assertFalse($node);
+		$this->reset($store->dbGsn());
+	}
+	
+	public function testNetsapceKvsNodesPass() {
+		$store = $this->netspace();
+
+		$store->gsnNodeRegister(new SpringDvs\Node("spring", "host", [127,0,1,2], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+		
+		$store->gsnNodeRegister(new SpringDvs\Node("spring2", "host2", [127,0,1,3], 
+									SpringDvs\DvspService::http, 
+									SpringDvs\DvspNodeState::enabled, 
+									SpringDvs\DvspNodeType::org));
+
+		$nodes = $store->gsnNodes();
+		$this->assertEquals(2, count($nodes));
+
+		$this->assertEquals('spring', $nodes[0]->springname());
+		$this->assertEquals('host', $nodes[0]->hostname());
+		$this->assertEquals(array(127,0,1,2), $nodes[0]->address());
+
+		$this->assertEquals('spring2', $nodes[1]->springname());
+		$this->assertEquals('host2', $nodes[1]->hostname());
+		$this->assertEquals(array(127,0,1,3), $nodes[1]->address());
+		$this->reset($store->dbGsn());
+	}
+}

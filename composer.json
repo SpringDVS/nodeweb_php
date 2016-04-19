@@ -1,9 +1,25 @@
 {
- 
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/home/cfg/Development/www/SpringLibs/NetLib/",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "/home/cfg/Development/www/SpringLibs/NodeLib/",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
 "require": {
     "mikecao/flight": "^1.2.20",
     "springdvs/netlib": "dev-master",
-    "springdvs/nodelib": "dev-master"
+    "springdvs/nodelib": "dev-master",
+    "fire015/flintstone": "^2.0"
 }
 
 }
