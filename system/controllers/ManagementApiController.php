@@ -15,7 +15,6 @@ class ManagementApiController {
 			case 'push':
 				$method = $func['zone'] . "Post";
 				break;
-
 			default:
 				return array();
 				
@@ -40,6 +39,14 @@ class ManagementApiController {
 	}
 	
 	private function registerPost() {
+		$frame = new SpringDvs\FrameRegistration(
+						true, 
+						SpringDvs\DvspNodeType::org, 
+						SpringDvs\DvspService::http, 
+						SpringDvs\nodereg_from_config());
 		
+		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_registration, $frame->serialise());
+		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['hostname']);
+		return \SpringDvs\HttpService::jsonEncodePacket($packet);
 	}
 }

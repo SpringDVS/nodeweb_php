@@ -10,7 +10,9 @@ Flight::route('/node/(@area/(@zone/(@method)))', function($area, $zone, $method,
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
 	
+	// ToDo:
 	// Check login here!!
+	// This is all administration for the node
 
 	switch($area) {
 	case 'api':
