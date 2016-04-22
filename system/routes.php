@@ -2,6 +2,7 @@
 include 'User.php';
 include 'system/controllers/ManagementApiController.php';
 include 'system/controllers/SpringApiController.php';
+include 'ProtocolHandler.php';
 
 Flight::register('user', 'User');
 Flight::register('manApi', 'ManagementApiController');
