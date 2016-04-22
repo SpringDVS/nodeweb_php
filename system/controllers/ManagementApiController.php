@@ -2,18 +2,18 @@
 
 class ManagementApiController {
 	public function request($func) {
-		
+
 		$method = "";
 		switch ($func['method']) {
 			case null:
 			case 'get':
 			case 'pull':
-				$method = $func['zone'] . "Get";
+				$method = $func['action'] . "Get";
 				break;
 
 			case 'post':
 			case 'push':
-				$method = $func['zone'] . "Post";
+				$method = $func['action'] . "Post";
 				break;
 			default:
 				return array();
@@ -27,7 +27,7 @@ class ManagementApiController {
 	}
 	
 	private function overviewGet() {
-		return array(
+		return json_encode( array(
 			'springname' => \SpringDvs\Config::$spec['springname'],
 			'hostname' => \SpringDvs\Config::$spec['hostname'],
 			'service' => \SpringDvs\Config::$net['service'],
@@ -35,7 +35,7 @@ class ManagementApiController {
 			
 			'master_addr' => \SpringDvs\Config::$net['master'],
 			'geosub' => 'esusx.uk',
-		);
+		) );
 	}
 	
 	private function registerPost() {
@@ -48,5 +48,13 @@ class ManagementApiController {
 		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_registration, $frame->serialise());
 		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['hostname']);
 		return \SpringDvs\HttpService::jsonEncodePacket($packet);
+	}
+	
+	private function statePost() {
+		if(!isset($_GET['state'])) return "{}";
+		
+		$state = $_GET['state'];
+		
+		
 	}
 }

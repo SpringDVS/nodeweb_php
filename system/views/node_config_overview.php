@@ -26,7 +26,7 @@
 			</tr>
 			<tr>
 				<td><strong>Service:</strong></td>
-				<td data-bind="text: service"></td>
+				<td data-bind="text: service"<>/td>
 			</tr>
 			<tr>
 				<td><strong>Address:</strong></td>

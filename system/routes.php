@@ -1,11 +1,13 @@
 <?php
 include 'User.php';
 include 'system/controllers/ManagementApiController.php';
+include 'system/controllers/SpringApiController.php';
 
 Flight::register('user', 'User');
 Flight::register('manApi', 'ManagementApiController');
+Flight::register('springApi', 'SpringApiController');
 
-Flight::route('/node/(@area/(@zone/(@method)))', function($area, $zone, $method, $route) {
+Flight::route('/node/(@area/(@action/(@method)))', function($area, $zone, $method, $route) {
 	$user = Flight::user();
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
@@ -34,6 +36,13 @@ Flight::route('/node/(@area/(@zone/(@method)))', function($area, $zone, $method,
 										'scriptsTop' => $scriptsTop,
 										'scriptsBottom' => $scriptsBottom,
 				));
+	
+}, true);
+
+Flight::route('/spring/', function() {
+	// This is the server interface for the node
+	$response = Flight::springApi()->request();
+	Flight::render('master_spring', array('response' => $response));
 	
 }, true);
 
