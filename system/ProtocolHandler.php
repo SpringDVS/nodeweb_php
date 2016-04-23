@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+include 'models/NetspaceKvs.php';
 /**
  * The protocol handler for processing packets as a SpringDVS node
  * and sometimes a root node if it has been elevated
- *
- * @author cfg
  */
 class ProtocolHandler {
 	
@@ -23,7 +16,7 @@ class ProtocolHandler {
 	 * @return bytes of serialised response
 	 */
 	public static function processBytes($bytes) {
-		
+		$nio = new NetspaceKvs(true, 'system/store/testunit/');
 		$packet = SpringDvs\DvspPacket::deserialise($bytes);
 		if(!$packet) {
 			$response = self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
@@ -32,8 +25,23 @@ class ProtocolHandler {
 		
 		switch($packet->header()->type) {
 	
+		case \SpringDvs\DvspMsgType::gsn_registration:
+			return self::processGsnRegistration($packet, $nio)->serialise();
+
+		case \SpringDvs\DvspMsgType::gsn_area:
+			return self::processGsnArea($nio)->serialise();
+			
+		case \SpringDvs\DvspMsgType::gsn_state:
+			return self::processFrameStateUpdate($packet, $nio)->serialise();
+		
+		case \SpringDvs\DvspMsgType::gsn_node_info:
+			return self::processFrameNodeRequestInfo($packet, $nio)->serialise();
+
+		case \SpringDvs\DvspMsgType::gsn_node_status:
+			return self::processFrameNodeRequestStatus($packet, $nio)->serialise();
+
 		default:
-			return self::rcodePacket(\SpringDvs\DvspRcode::ok)->serialise();
+			return self::rcodePacket(\SpringDvs\DvspRcode::malformed_content)->serialise();
 		}
 	}
 	
@@ -51,4 +59,89 @@ class ProtocolHandler {
 				$frame->serialise()
 			);
 	}
+	
+	private static function processGsnRegistration(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		$frame = $packet->contentAs(SpringDvs\FrameRegistration::contentType());
+		
+		if(!$frame) self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
+			
+		$node = SpringDvs\Node::fromNoderegAddr($frame->nodereg, SpringDvs\Node::addressFromString($_SERVER['REMOTE_ADDR']));
+		$node->updateService($frame->service);
+		$node->updateTypes($frame->type);
+		if($frame->register) {
+			if(!$nio->gsnNodeRegister($node))
+				return self::rcodePacket(\SpringDvs\DvspRcode::netspace_error);
+			return self::rcodePacket(\SpringDvs\DvspRcode::ok);
+		} else {
+			if(!$nio->gsnNodeUnregister($node))
+				return self::rcodePacket(\SpringDvs\DvspRcode::netspace_error);
+			return self::rcodePacket(\SpringDvs\DvspRcode::ok);
+		}
+	}
+	
+	private static function processGsnArea(NetspaceKvs &$nio) {
+		$nodelist = self::nodelistFromNodes(
+				$nio->gsnNodes()
+		);
+		$frame = new \SpringDvs\FrameNetwork($nodelist);
+		return self::forgePacket(SpringDvs\DvspMsgType::gsn_response_network, $frame);
+	}
+	
+	private static function processFrameStateUpdate(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		$frame = $packet->contentAs(SpringDvs\FrameStateUpdate::contentType());
+		if(!$frame) self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
+		
+		$node = \SpringDvs\Node::from_springname($frame->springname);
+		$check = $nio->gsnNodeBySpringName($frame->springname);
+		
+		if(!$check)
+			return self::rcodePacket(\SpringDvs\DvspRcode::netspace_error);
+
+		if($check->addressToString($check->address()) != $_SERVER['REMOTE_ADDR'])
+			return self::rcodePacket(\SpringDvs\DvspRcode::network_error);
+
+		$node->updateState($frame->state);
+		
+		$nio->gsnNodeUpdate($node);
+		return self::rcodePacket(\SpringDvs\DvspRcode::ok);
+	}
+	
+	private static function processFrameNodeRequestInfo(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		$frame = $packet->contentAs(SpringDvs\FrameNodeRequest::contentType());
+		if(!$frame) self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
+		
+		$node = $nio->gsnNodeBySpringName($frame->node);
+		if(!$node)
+			return self::rcodePacket(\SpringDvs\DvspRcode::netspace_error);
+		
+		$info = new \SpringDvs\FrameNodeInfo(200, $node->types(), $node->service(), $node->address(), $node->toNodeRegister());
+		return self::forgePacket(SpringDvs\DvspMsgType::gsn_response_node_info, $info);
+	}
+	
+	private static function processFrameNodeRequestStatus(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		$frame = $packet->contentAs(SpringDvs\FrameNodeRequest::contentType());
+		if(!$frame) self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
+		
+		$node = $nio->gsnNodeBySpringName($frame->node);
+		if(!$node)
+			return self::rcodePacket(\SpringDvs\DvspRcode::netspace_error);
+		
+		$status = new \SpringDvs\FrameNodeStatus($node->state());
+		return self::forgePacket(SpringDvs\DvspMsgType::gsn_response_status, $status);
+	}
+	
+	public static function nodelistFromNodes($nodes) {
+		$nodelist = "";
+		foreach($nodes as $node) {
+			$nodelist .= $node->toNodeString();
+		}
+		
+		return $nodelist;
+	}
+	
+	public static function forgePacket($type, \SpringDvs\iFrame& $frame) {
+		return \SpringDvs\DvspPacket::ofType($type, $frame->serialise());
+	}
+	
+	
 }
