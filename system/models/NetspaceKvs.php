@@ -11,7 +11,6 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	private $geotopNetspace;
 	
 	public function __construct($unitTest = false, $testDir = "") {
-		echo __DIR__;
 		$options = array();
 		if( $unitTest ) {
 			$options['dir'] = $testDir;
@@ -105,6 +104,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		);
 		
 		$this->geosubNetspace->set($node->springname(), $nodeArray);
+		return true;
 	}
 
 	public function gsnNodeUnregister($node) {
@@ -112,6 +112,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 			return false;
 
 		$this->geosubNetspace->delete($node->springname());
+		return true;
 	}
 
 	public function gsnNodeUpdate($node) {
@@ -121,6 +122,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		$details['status'] = $node->state();
 		
 		$this->geosubNetspace->set($node->springname(), $details);
+		return true;
 	}
 
 	public function gtnRootNodes() {
@@ -144,7 +146,8 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 			'geosub' => $geosub,
 		);
 		
-		$this->geotopNetspace->set($key, $nodeArray);		
+		$this->geotopNetspace->set($key, $nodeArray);
+		return true;
 	}
 
 	public function gtnGeosubUnregister($node, $geosub) {
@@ -155,6 +158,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 			return false; 
 		
 		$this->geotopNetspace->delete($key);
+		return true;
 	}
 
 	public function gtnGeosubRootNodes($geosub) {
