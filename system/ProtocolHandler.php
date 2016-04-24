@@ -40,6 +40,9 @@ class ProtocolHandler {
 		case \SpringDvs\DvspMsgType::gsn_node_status:
 			return self::processFrameNodeRequestStatus($packet, $nio)->serialise();
 
+		case \SpringDvs\DvspMsgType::gsn_type_request:
+			return self::processFrameTypeRequest($packet, $nio)->serialise();
+
 		default:
 			return self::rcodePacket(\SpringDvs\DvspRcode::malformed_content)->serialise();
 		}
@@ -130,6 +133,23 @@ class ProtocolHandler {
 		return self::forgePacket(SpringDvs\DvspMsgType::gsn_response_status, $status);
 	}
 	
+	private static function processFrameTypeRequest(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		$frame = $packet->contentAs(SpringDvs\FrameTypeRequest::contentType());
+		if(!$frame) self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
+		
+		$nodes = $nio->gsnNodesByType($frame->type);
+		
+		$nodelist = self::nodelistFromNodes($nodes);
+		$list = new \SpringDvs\FrameNetwork($nodelist);
+		return self::forgePacket(SpringDvs\DvspMsgType::gsn_response_network, $list);
+	}
+
+	private static function processFrameResolution(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		// ToDo!!
+	}
+	
+	
+
 	public static function nodelistFromNodes($nodes) {
 		$nodelist = "";
 		foreach($nodes as $node) {
