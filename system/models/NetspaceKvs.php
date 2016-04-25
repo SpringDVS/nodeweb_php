@@ -92,7 +92,8 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	}
 
 	public function gsnNodeRegister($node) {
-		if($this->geosubNetspace->get($node->springname()) !== false)
+		if($this->geosubNetspace->get($node->springname()) !== false
+		|| $this->gsnNodeByHostname($node->hostname()) !== false)
 			return false; 
  
 		$nodeArray = array(
@@ -108,7 +109,8 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	}
 
 	public function gsnNodeUnregister($node) {
-		if($this->geosubNetspace->get($node->springname()) === false)
+		if($this->geosubNetspace->get($node->springname()) === false 
+		|| $this->gsnNodeByHostname($node->hostname()) === false)
 			return false;
 
 		$this->geosubNetspace->delete($node->springname());
