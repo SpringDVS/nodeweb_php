@@ -1,6 +1,7 @@
 <?php
 include '../vendor/autoload.php';
 include '../system/models/NetspaceKvs.php';
+\SpringDvs\Config::$spec['testing'] = true;
 
 class DvspNetspaceKvsTest extends PHPUnit_Framework_TestCase {
 	private function netspace() {
@@ -549,5 +550,38 @@ class DvspNetspaceKvsTest extends PHPUnit_Framework_TestCase {
 		$nodes = $store->gtnGeosubRootNodes('surry');
 		$this->assertEquals(0, count($nodes));
 		$this->reset($store->dbGtn());
+	}
+	
+	public function testNetspaceKvsLiveEnvUpdateAddress() {
+		$store = $this->netspace();
+
+		$node = SpringDvs\Node::from_nodestring("spring,host,127.0.1.2");
+		$store->gsnNodeRegister($node);
+
+		$c1 = $store->gsnNodeBySpringName("spring");
+		$this->assertEquals([127,0,1,2], $c1->address());
+		
+		$this->assertEquals(
+				true,
+				update_address_live_env($store, "spring,host,192.168.55.66")
+		);
+		$c2 = $store->gsnNodeBySpringName("spring");
+		$this->assertEquals([192,168,55,66], $c2->address());
+	}
+
+	public function testNetspaceKvsLiveEnvAddRoot() {
+		$store = $this->netspace();
+
+		$this->assertEquals(
+			true,
+			add_geosub_root_live_env($store, "spring,host,192.168.1.2,esusx")
+		);
+		
+		$c1 = $store->gtnGeosubNodeBySpringname("spring", "esusx");
+		
+		$this->assertEquals("spring", $c1->springname());
+		$this->assertEquals("host", $c1->hostname());
+		$this->assertEquals([192,168,1,2], $c1->address());
+		
 	}
 }
