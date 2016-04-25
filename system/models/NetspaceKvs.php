@@ -214,3 +214,35 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		);
 	}
 }
+
+
+function reset_live_env(NetspaceKvs $nio) {
+	if(!\SpringDvs\Config::$spec['testing']) return;
+
+	try {
+			unlink($nio->dbGsn()->getDatabase()->getPath());
+			unlink($nio->dbGtn()->getDatabase()->getPath());
+	} catch(Exception $e) { }
+}
+
+function update_address_live_env(NetspaceKvs $nio, $nodestr) {
+	if(!\SpringDvs\Config::$spec['testing']) return false;
+	
+	$node = SpringDvs\Node::from_nodestring($nodestr);
+	$current = $nio->dbGsn()->get($node->springname());
+	if(!$current) return false;
+	
+	$current['address'] = \SpringDvs\Node::addressToString($node->address());
+	$nio->dbGsn()->set($node->springname(), $current);
+}
+
+function add_geosub_root_live_env(NetspaceKvs $nio, $nodestr) {
+	if(!\SpringDvs\Config::$spec['testing']) return;
+	
+	$node = \SpringDvs\Node::from_nodestring($nodestr);
+	$node->updateService(\SpringDvs\DvspService::dvsp);
+	$geosub = \SpringDvs\Node::geosubFromNodeRegister($nodestr);
+	if(!$geosub) return;
+	
+	$nio->gtnGeosubRegister($node, $geosub);
+}
