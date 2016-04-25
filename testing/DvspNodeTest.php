@@ -48,4 +48,16 @@ class DvspNodeTest extends PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals("spring,sub.host.tld/node/", $node->toNodeRegister());
 	}
+
+	public function testGeosubFromNodeRegPass() {
+		$gsn = \SpringDvs\Node::geosubFromNodeRegister("spring,sub.host.tld/node/,127.0.1.2,esusx");
+		
+		$this->assertEquals("esusx", $gsn);
+	}
+	
+	public function testGeosubFromNodeRegFail() {
+		$gsn = \SpringDvs\Node::geosubFromNodeRegister("spring,sub.host.tld/node/,127.0.1.2");
+		
+		$this->assertEquals(false, $gsn);
+	}
 }
