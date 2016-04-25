@@ -148,7 +148,37 @@ class ProtocolHandler {
 		// ToDo!!
 	}
 	
+	private static function processFrameGtnRegister(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		$frame = $packet->contentAs(SpringDvs\FrameGtnRegistration::contentType());
+		if(!$frame) return self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
+
+		$gsn = SpringDvs\Node::geosubFromNodeRegister($frame->nodereg);
+		if(!$gsn) return self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
+		
+		$node = SpringDvs\Node::from_nodestring($frame->nodereg);
+		if(!self::remoteIsRoot($gsn)) {
+			return self::rcodePacket(\SpringDvs\DvspRcode::network_error);
+		}
+
+		if($frame->register) {
+			if(!$nio->gtnGeosubRegister($node, $gsn))
+				return self::rcodePacket(\SpringDvs\DvspRcode::netspace_error);
+			return self::rcodePacket(\SpringDvs\DvspRcode::ok);
+		} else {
+			if(!$nio->gtnGeosubUnregister($node, $gsn))
+				return self::rcodePacket(\SpringDvs\DvspRcode::netspace_error);
+			return self::rcodePacket(\SpringDvs\DvspRcode::ok);
+		}
+	}
 	
+	private static function processFrameGeosub(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		$f = $packet->contentAs(SpringDvs\FrameGeosub::contentType());
+		if(!$f) return self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
+
+		$nodes = $nio->gtnGeosubRootNodes($f->geosub);
+		$frame = new \SpringDvs\FrameNetwork(self::nodelistFromNodes($nodes));
+		return self::forgePacket(SpringDvs\DvspMsgType::gsn_response_network, $list); 
+	}
 
 	public static function nodelistFromNodes($nodes) {
 		$nodelist = "";
@@ -163,5 +193,14 @@ class ProtocolHandler {
 		return \SpringDvs\DvspPacket::ofType($type, $frame->serialise());
 	}
 	
-	
+	private static function remoteIsRoot($geosub) {
+		$addr = \SpringDvs\Node::addressToString($_SERVER['REMOTE_ADDR']);
+		$roots = $nio->gtnGeosubRootNodes($gsn);
+		foreach($roots as $root) {
+			if($root->address() == $addr)
+				return true;
+		}
+		
+		return false;
+	}
 }
