@@ -223,6 +223,8 @@ function reset_live_env(NetspaceKvs $nio) {
 			unlink($nio->dbGsn()->getDatabase()->getPath());
 			unlink($nio->dbGtn()->getDatabase()->getPath());
 	} catch(Exception $e) { }
+	
+	return true;
 }
 
 function update_address_live_env(NetspaceKvs $nio, $nodestr) {
@@ -234,15 +236,17 @@ function update_address_live_env(NetspaceKvs $nio, $nodestr) {
 	
 	$current['address'] = \SpringDvs\Node::addressToString($node->address());
 	$nio->dbGsn()->set($node->springname(), $current);
+	return true;
 }
 
 function add_geosub_root_live_env(NetspaceKvs $nio, $nodestr) {
-	if(!\SpringDvs\Config::$spec['testing']) return;
+	if(!\SpringDvs\Config::$spec['testing']) return false;
 	
 	$node = \SpringDvs\Node::from_nodestring($nodestr);
 	$node->updateService(\SpringDvs\DvspService::dvsp);
 	$geosub = \SpringDvs\Node::geosubFromNodeRegister($nodestr);
-	if(!$geosub) return;
+	if(!$geosub) return false;
 	
 	$nio->gtnGeosubRegister($node, $geosub);
+	return true;
 }
