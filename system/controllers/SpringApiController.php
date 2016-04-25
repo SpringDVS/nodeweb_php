@@ -16,7 +16,7 @@ class SpringApiController {
 		$in = SpringDvs\hex_to_bin($request);
 		$out = ProtocolHandler::processBytes($in);
 		
-		return bin2hex($out);
+		return \SpringDvs\bin_to_hex($out);
 		
 	}
 }
