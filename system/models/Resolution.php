@@ -16,27 +16,30 @@ class Resolution {
 		
 		$url = new \SpringDvs\Url($urlstr);
 		if(!empty($url->gtn())) {
-			if(!emtpy($url->glq())) {
+			if(!empty($url->glq())) {
 				// Handle Geloc
 			} else {
 				// Don't need no stinkin' GTN
-				array_pop($url->route());
+				$url->pop();
 			}
 		}
 		
 		// Check to see if we are a root on the specified geosub
 		if(count($url->route()) > 1) {
 			if(end($url->route()) == \SpringDvs\Config::$net['geosub']) {
-				array_pop($url->route());
+				$url->pop();
 			}
 		}
 		
 		if(count($url->route()) == 1) {
 			$nodesn = end($url->route());
 			$node = $nio->gsnNodeBySpringName($nodesn);
+		
+			if(!$node) return false;
+
 			$frame = new SpringDvs\FrameNodeInfo(
 					200, 
-					$node->types(),
+					$node->type(),
 					$node->service(),
 					$node->address(),
 					$node->toNodeRegister());
@@ -46,11 +49,18 @@ class Resolution {
 					$frame->serialise()
 				);
 			
-		} else if(count($url) > 1) {
-			$rootNodes = $nio->gtnGeosubRootNodes(end($url->route()));
+		} else if(count($url->route()) > 1) {
 			
-			if(empty($rootNodes)) return false;
+			$rootNodes = $nio->gtnGeosubRootNodes(end($url->route()));
 
+			if(empty($rootNodes)) {
+					$frame = new SpringDvs\FrameResponse(SpringDvs\DvspRcode::netspace_error);
+					return SpringDvs\DvspPacket::ofType(
+						\SpringDvs\DvspMsgType::gsn_response, 
+						$frame->serialise()
+					);
+			}
+			$url->pop();
 			$frame = new \SpringDvs\FrameResolution($url->toString());
 			$packet = SpringDvs\DvspPacket::ofType(
 					\SpringDvs\DvspMsgType::gsn_resolution,
@@ -61,10 +71,11 @@ class Resolution {
 			// We are only using the first one for now
 			$response = \SpringDvs\HttpService::sendPacket(
 					$packet, 
-					\SpringDvs\Node::addressToString($rootNodes[0]->address())
+					\SpringDvs\Node::addressToString($rootNodes[0]->address()),
+					$rootNodes[0]->toHostResource()
 				);
 			
-			return $reponse;
+			return $response;
 		} else {
 			return false;
 		}
