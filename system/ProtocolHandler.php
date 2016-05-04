@@ -2,6 +2,7 @@
 
 include 'models/NetspaceKvs.php';
 include 'models/Resolution.php';
+include 'RequestHandler.php';
 /**
  * The protocol handler for processing packets as a SpringDVS node
  * and sometimes a root node if it has been elevated
@@ -52,6 +53,9 @@ class ProtocolHandler {
 			
 		case \SpringDvs\DvspMsgType::gsn_resolution:
 			return self::processFrameResolution($packet, $nio)->serialise();
+
+		case \SpringDvs\DvspMsgType::gsn_request:
+			return self::processRequest($packet, $nio)->serialise();
 			
 		case \SpringDvs\DvspMsgType::unit_test:
 			return self::processFrameUnitTest($packet, $nio)->serialise();
@@ -206,6 +210,11 @@ class ProtocolHandler {
 		return self::forgePacket(SpringDvs\DvspMsgType::gsn_response_network, $frame); 
 	}
 	
+	private static function processRequest(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
+		$url = $packet->contentAs(SpringDvs\FrameResolution::contentType());
+		return RequestHandler::process($url->url);
+	}
+	
 
 	private static function processFrameUnitTest(\SpringDvs\DvspPacket &$packet, NetspaceKvs &$nio) {
 		if(!\SpringDvs\Config::$spec['testing'])
@@ -229,6 +238,7 @@ class ProtocolHandler {
 		
 		return self::rcodePacket(\SpringDvs\DvspRcode::ok);
 	}
+
 	public static function nodelistFromNodes($nodes) {
 		$nodelist = "";
 		foreach($nodes as $node) {
