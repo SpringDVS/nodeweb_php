@@ -21,8 +21,18 @@ class RequestHandler {
 		}
 		
 		$response = include "$path";
+		
+		$node = \SpringDvs\nodeurl_from_config();
+		
+		/*
+		 * ToDo:
+		 * This could be messagepack instead of JSON
+		 */
+		
+		$json = json_encode(array($node => $response));
 		return \SpringDvs\DvspPacket::ofType(
-					\SpringDvs\DvspMsgType::gsn_response_high, $response
+					\SpringDvs\DvspMsgType::gsn_response_high,
+					$json
 			);
 	}
 }
