@@ -4,4 +4,5 @@
 
 \SpringDvs\Config::$net['hostname'] = "spring.greenman.zu";
 \SpringDvs\Config::$net['geosub'] = "localdom";
+\SpringDvs\Config::$net['geotop'] = "uk";
 \SpringDvs\Config::$spec['testing'] = true;
