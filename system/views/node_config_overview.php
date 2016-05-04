@@ -4,7 +4,7 @@
 	
 	<div class="white-container raised">
 		<h3>Tasks</h3>
-		<button>Bring Online</button>
+		<button id="action-status-update">Bring Online</button>
 	</div>
 	
 </div>
@@ -50,7 +50,7 @@
 			</tr>
 			<tr>
 				<td><strong>Status:</strong></td>
-				<td data-bind="">offline</td>
+				<td data-bind="text: status" id="bind-status">offline</td>
 			</tr>
 		</tbody>
 		</table>

@@ -34,7 +34,7 @@ class ManagementApiController {
 			'address' => $_SERVER['SERVER_ADDR'],
 			
 			'master_addr' => \SpringDvs\Config::$net['master'],
-			'geosub' => 'esusx.uk',
+			'geosub' => \SpringDvs\Config::$net['geosub'] . '.' . \SpringDvs\Config::$net['geotop'],
 		) );
 	}
 	
@@ -46,7 +46,7 @@ class ManagementApiController {
 						SpringDvs\nodereg_from_config());
 		
 		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_registration, $frame->serialise());
-		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['hostname']);
+		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['master'], SpringDvs\hostres_from_config());
 		return \SpringDvs\HttpService::jsonEncodePacket($packet);
 	}
 	
@@ -54,7 +54,26 @@ class ManagementApiController {
 		if(!isset($_GET['state'])) return "{}";
 		
 		$state = $_GET['state'];
+		if($state == "enabled") {
+			$frame = new SpringDvs\FrameStateUpdate(SpringDvs\DvspNodeState::enabled, \SpringDvs\Config::$spec['springname']);
+		} else {
+			$frame = new SpringDvs\FrameStateUpdate(SpringDvs\DvspNodeState::disabled, \SpringDvs\Config::$spec['springname']);
+		}
+		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_state, $frame->serialise());
+		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['master'], SpringDvs\hostres_from_config());	
+		return \SpringDvs\HttpService::jsonEncodePacket($packet);
+	}
+	
+	private function stateGet() {
+		$springname = \SpringDvs\Config::$spec['springname'];
 		
+		if(isset($_GET['springname'])) $springname = $_GET['springname'];
 		
+		$frame = new SpringDvs\FrameStatusRequest($springname);
+
+		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_node_status, $frame->serialise());
+		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['master'], SpringDvs\hostres_from_config());
+
+		return \SpringDvs\HttpService::jsonEncodePacket($packet);
 	}
 }
