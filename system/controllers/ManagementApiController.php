@@ -39,6 +39,8 @@ class ManagementApiController {
 			
 			'master_addr' => \SpringDvs\Config::$net['master'],
 			'geosub' => \SpringDvs\Config::$net['geosub'] . '.' . \SpringDvs\Config::$net['geotop'],
+			'status' => "Unknown",
+			'register' => "Unregistered",
 		) );
 	}
 	

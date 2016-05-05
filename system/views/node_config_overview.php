@@ -51,10 +51,16 @@
 				<td><strong>Status:</strong></td>
 				<td data-bind="text: status" id="bind-status">offline</td>
 			</tr>
+			<tr>
+				<td><strong>Registered:</strong></td>
+				<td data-bind="text: register" id="bind-register">Unknown</td>
+			</tr>
 		</tbody>
 		</table>
 		
 		<button id="action-status-update" style="margin-top: 10px;">Bring Online</button>
+		<button id="action-register" style="margin-top: 10px;">Register</button>
+		<div id="action-error" style="color: #e9322d; font-weight: bold; margin-top:10px;"></div>
 	</div>
 		
 	</div>

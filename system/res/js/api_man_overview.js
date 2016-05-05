@@ -17,17 +17,32 @@ var ManOverviewController = {
     refreshStatus: function () {
         $.getJSON('/node/api/state/get', function(data) {
             status = "Unknown";
+            reg = "Unregistered"
             if(data.type == 34) {
                 switch(data.content.status) {
                     case 0: status = "Disabled"; break;
                     case 1: status = "Enabled"; break;
                 }
+                reg = "Registered";
+            }
+            
+            if(reg != "Unregistered") {
+                $("#action-register").hide();
+            } else {
+                $("#action-register").click(ManOverviewController.actionRegister);
             }
             
             ManOverviewController.viewModel.status = status;
-            node = $("#bind-status").get(0);            
+            ManOverviewController.viewModel.register = reg;
+            
+            node = $("#bind-status").get(0);
             ko.cleanNode(node);
             ko.applyBindings(ManOverviewController.viewModel, node);
+            
+            rnode = $("#bind-register").get(0);
+            ko.cleanNode(rnode);
+            ko.applyBindings(ManOverviewController.viewModel, rnode);
+
             button = $("#action-status-update");
             button.off();
 
@@ -51,12 +66,25 @@ var ManOverviewController = {
 
     init: function() {
         $.getJSON('/node/api/overview/get', function(data) {
-            console.log(data);
             ManOverviewController.viewModel =  ko.mapping.fromJS(data);
             ko.applyBindings( ManOverviewController.viewModel );
             ManOverviewController.refreshStatus();
         });
     },
+    
+    actionRegister: function() {
+        
+       $.getJSON('/node/api/register/push/', function(data) {
+            $("#action-error").text("");
+            if(data.type == 30
+            && data.frame == "FrameResponse"
+            && data.content.code == 200) {
+                ManOverviewController.refreshStatus();
+            } else {
+                $("#action-error").text("Error registering on network");
+            }
+        });       
+    }
 };
 
 ManOverviewController.init();
