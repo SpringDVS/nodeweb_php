@@ -1,3 +1,7 @@
+/* Notice:  Copyright 2016, The Care Connections Initiative c.i.c.
+ * Author:  Charlie Fyvie-Gauld <cfg@zunautica.org>
+ * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
+ */
 
 var ManOverviewController = {
     self: this,
@@ -27,25 +31,24 @@ var ManOverviewController = {
             button = $("#action-status-update");
             button.off();
 
-            if(status == "Disabled") {
-
+            if(status == "Enabled") {
+                button.text("Bring Offline");
                 button.click(function() {
-                   console.log("Updating");
-                   $.getJSON('/node/api/state/push?state=enabled', function(data) {;
+                   $.getJSON('/node/api/state/push?state=disabled', function(data) {;
                         ManOverviewController.refreshStatus();
                    });
                 });
             } else {
-                button.text("Bring Offline");
+                button.text("Bring Online");
                 button.click(function() {
-
-                   $.getJSON('/node/api/state/push?state=disabled', function(data) {
+                   $.getJSON('/node/api/state/push?state=enabled', function(data) {
                        ManOverviewController.refreshStatus();
                    });
                 });
             }
         });
     },
+
     init: function() {
         $.getJSON('/node/api/overview/get', function(data) {
             console.log(data);
@@ -54,11 +57,6 @@ var ManOverviewController = {
             ManOverviewController.refreshStatus();
         });
     },
-    
-    actionEnableNode: function() {
-        $.getJSON('/node/api/state/push')
-    },
-
 };
 
 ManOverviewController.init();

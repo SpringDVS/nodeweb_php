@@ -4,7 +4,6 @@
 	
 	<div class="white-container raised">
 		<h3>Tasks</h3>
-		<button id="action-status-update">Bring Online</button>
 	</div>
 	
 </div>
@@ -54,6 +53,8 @@
 			</tr>
 		</tbody>
 		</table>
+		
+		<button id="action-status-update" style="margin-top: 10px;">Bring Online</button>
 	</div>
 		
 	</div>
