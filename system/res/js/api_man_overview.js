@@ -24,17 +24,21 @@ var ManOverviewController = {
             node = $("#bind-status").get(0);            
             ko.cleanNode(node);
             ko.applyBindings(ManOverviewController.viewModel, node);
+            button = $("#action-status-update");
+            button.off();
+
             if(status == "Disabled") {
-                $("#action-status-update").text("Bring Online");
-                $("#action-status-update").click(function() {
+
+                button.click(function() {
                    console.log("Updating");
-                   $.getJSON('/node/api/state/push?state=enabled', function(data) {});
-                   ManOverviewController.refreshStatus();
+                   $.getJSON('/node/api/state/push?state=enabled', function(data) {;
+                        ManOverviewController.refreshStatus();
+                   });
                 });
             } else {
-                $("#action-status-update").text("Bring Offline");
-                $("#action-status-update").click(function() {
-                   console.log("Updating");
+                button.text("Bring Offline");
+                button.click(function() {
+
                    $.getJSON('/node/api/state/push?state=disabled', function(data) {
                        ManOverviewController.refreshStatus();
                    });
@@ -51,7 +55,7 @@ var ManOverviewController = {
         });
     },
     
-    enableNode: function() {
+    actionEnableNode: function() {
         $.getJSON('/node/api/state/push')
     },
 
