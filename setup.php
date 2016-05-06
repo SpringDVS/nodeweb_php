@@ -10,7 +10,8 @@
 	if(!filter_input(INPUT_GET, 'generate')) {
 		$body_content = setup_form();
 	} else {
-		$body_content = setup_complete();
+		echo setup_complete();
+		return;
 	}
 ?>
 <!doctype html>
@@ -41,8 +42,10 @@
 	<script type="text/javascript" src="/system/res/js/jquery-2.2.1.js"></script>
 	<script type="text/javascript">
 		function getGeosubDetails() {
+			$("#wait").show();
 			geosub = $("#geosub").val()
 			$.getJSON("?request="+geosub, function(data) {
+				$("#wait").hide();
 				if(data.hostname == "invalid") {
 					alert("Error\nThe supplied Geosub `"+geosub+"` does not exist");
 					return;
@@ -53,6 +56,117 @@
 				
 				uri = "spring://"+$("#springname").val() + "." + geosub +".uk";
 				$("#uri").text(uri);
+				checkEmptyElement("#geosub", "#FFFFFF");
+				checkEmptyElement("#primary-hostname", "#EAEDED");
+				checkEmptyElement("#primary-address", "#EAEDED");
+				checkEmptyElement("#primary-service", "#EAEDED");
+			});
+		}
+		
+		function checkEmptyElement(id, defaultColor) {
+			if($(id).val() == "") {
+				$(id).css("background-color", "#FFBFC3");
+				return false;
+			} else {
+				$(id).css("background-color", defaultColor);
+				return true;
+			}
+		}
+		
+		function checkValidElement(id, defaultColor, pred) {
+			if(pred($(id))) {
+				$(id).css("background-color", defaultColor);
+				return true
+			} else {
+				$(id).css("background-color", "#FFBFC3");
+				return false;
+			}
+		}
+		
+		function validatePasswords() {
+			if($("#pass").val() != $("#passcheck").val()) {
+				$("#pass").css("background-color", "#FFBFC3");
+				$("#passcheck").css("background-color", "#FFBFC3");
+				return false;
+			} else {
+				$("#pass").css("background-color", "#FFFFFF");
+				$("#passcheck").css("background-color", "#FFFFFF");
+				return true;
+			}
+		}
+		
+		function validateForm() {
+			complete = true;
+			
+			if(!checkEmptyElement("#pass", "#FFFFFF")) {
+				complete = false;
+			} else if(!validatePasswords()) {
+				complete = false;
+			}
+
+			if(!checkEmptyElement("#passcheck", "#FFFFFF")) {
+				complete = false;
+			} else if(!validatePasswords()) {
+				complete = false;
+			}
+			
+
+			
+			if(!checkEmptyElement("#springname", "#FFFFFF")) complete = false;
+			if(!checkEmptyElement("#hostname", "#FFFFFF")) complete = false;
+			
+			
+			if(!checkEmptyElement("#geosub", "#FFFFFF")) complete = false;
+			if(!checkEmptyElement("#primary-hostname", "#EAEDED")) complete = false;
+			if(!checkEmptyElement("#primary-address", "#EAEDED")) complete = false;
+			if(!checkEmptyElement("#primary-service", "#EAEDED")) complete = false;
+			
+			if(!checkEmptyElement("#token", "#FFFFFF")) complete = false;
+			
+			if(!checkValidElement("#token", "#FFFFFF", function(element){
+				if(element.val().length != 32) return false;
+				
+				return true;
+			}));
+
+			
+			if(!complete) {
+				$("#errors").text("There are errors in the form");
+				$("#success").text("");
+				return false;
+			} else {
+				$("#errors").text("");
+				$("#success").text("Form Valid");
+			}
+			
+			return true;
+		}
+		
+		function generate() {
+			
+			if(!validateForm()) return;
+			
+
+			
+	
+			postStr = "springname=" + $("#springname").val()
+				+ "&hostname=" + $("#hostname").val()
+				+ "&pass=" + $("#pass").val()
+				+ "&passcheck=" + $("#passcheck").val()
+				+ "&geosub=" + $("#geosub").val()
+				+ "&primary-hostname=" + $("#primary-hostname").val()
+				+ "&primary-service=" + $("#primary-service").val()
+				+ "&primary-address=" + $("#primary-address").val()
+				+ "&token=" + $("#token").val();
+		
+			$.post("?generate=true",postStr, function(data) {
+				if(data == "ok"){
+					alert("Generated config successfully");
+					$("#success").text("Generated Configuration");
+				} else {
+					alert("Error writing config file!\nCheck permissions on directory");
+					
+				}
 			});
 		}
 	</script>
@@ -86,7 +200,11 @@
 	
 			<div class="white-container raised">
 			<h3>Configuration</h3>
-			<div class="pure-form pure-form-stacked">
+			This script is used to generatate the configuration for your node.
+			It is <em>unimaginably</em> important that you delete this script file once you've set 
+			it up. If you need to set it up again, you can download it from the
+			spring-dvs.org or edit the config manually.
+			<div class="pure-form pure-form-stacked" style="margin-top: 30px;">
 				<fieldset class="pure-g">
 					<legend class="pure-u-1-1"><strong>Local Node</strong></legend>
 					
@@ -126,13 +244,33 @@
 						</div>
 					</aside>
 					
-					<legend class="pure-u-1-1"><strong>Network</strong></legend>
+					<div class="pure-1-1">&nbsp;</div>		
+					<section class="pure-u-1-4">
+						
+						<label for="pass">Password:</label>
+						<input id="pass" type="password" placeholder="">
+						<label for="pass">Recheck:</label>
+						<input id="passcheck" type="password" placeholder="">
+						
+					</section>
+		
+					<aside class='pure-u-3-4'>
+						<div class="note">
+							This will be the <strong>Password</strong> for the 
+							node administrator account
+						</div>
+					</aside>
+					
+					
+
+					<legend class="pure-u-1-1" style="margin-top: 100px;"><strong>Network</strong></legend>
 					
 					<section class="pure-u-1-4">
 						
 						<label for="geosub">Geosub Network:</label>
 						<input id="geosub" type="text" placeholder="">
 						<button onclick="getGeosubDetails()">Pull Details</button>
+						<img id="wait" src="/system/res/img/wait.gif" style="display: none;">
 					</section>
 					
 					<aside class='pure-u-3-4'>
@@ -156,7 +294,7 @@
 					<aside class='pure-u-3-4'>
 						<div class="note">
 							The primary details for the network are filled out
-							automatically from the Spring server
+							automatically from the Spring network root server
 						</div>
 					</aside>
 					
@@ -190,7 +328,10 @@
 					</section>
 				</fieldset>
 				
-				<button>Generate Configuration</button>
+				<button onclick="generate()">Generate Configuration</button>
+				Note: This will overwrite any previous configuration
+				<div id="errors" style="color: #b94a48; font-weight: bold;">&nbsp;</div>
+				<div id="success" style="color: #1D5F12; font-weight: bold;"></div>
 			</div>
 			</div>
 	
@@ -201,6 +342,38 @@
 	}
 	
 	function setup_complete() {
-		return "Blah2";
+		$springname = filter_input(INPUT_POST, 'springname');
+		$hostname = filter_input(INPUT_POST, 'hostname');
+		$pass = filter_input(INPUT_POST, 'pass');
+		$passcheck = filter_input(INPUT_POST, 'passcheck');
+		$geosub = filter_input(INPUT_POST, 'geosub');
+		$primaryHostname = filter_input(INPUT_POST, 'primary-hostname');
+		$primaryAddress = filter_input(INPUT_POST, 'primary-address');
+		$primaryService = filter_input(INPUT_POST, 'primary-service');
+		$token = filter_input(INPUT_POST, 'token');
+		
+		$text = "
+<?php
+	\SpringDvs\Config::\$spec['springname'] = \"$springname\";
+	\SpringDvs\Config::\$spec['hostname'] = \"$hostname\";
+	\SpringDvs\Config::\$spec['password'] = \"$pass\";
+	\SpringDvs\Config::\$spec['token'] = \"$token\";
+
+	\SpringDvs\Config::\$net['master'] = \"$primaryAddress\";
+	\SpringDvs\Config::\$net['hostname'] = \"$primaryHostname\";
+	\SpringDvs\Config::\$net['hostres'] = \"$primaryService\";
+	\SpringDvs\Config::\$net['geosub'] = \"$geosub\";
+	\SpringDvs\Config::\$net['geotop'] = \"uk\";
+	\SpringDvs\Config::\$spec['testing'] = false;
+";
+		$fp = fopen("system/config.php", 'w');
+		if(!$fp) {
+			return "error";
+		}
+		fwrite($fp, $text);
+		fclose($fp);
+		
+		return "ok";
+		
 	}
 ?>
