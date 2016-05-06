@@ -7,11 +7,12 @@
 include 'User.php';
 include 'system/controllers/ManagementApiController.php';
 include 'system/controllers/SpringApiController.php';
-include 'ProtocolHandler.php';
+include 'system/handlers/ProtocolHandler.php';
 
 Flight::register('user', 'User');
 Flight::register('manApi', 'ManagementApiController');
 Flight::register('springApi', 'SpringApiController');
+Flight::register('gatewayApi', 'GatewayApiController');
 
 Flight::route('/node/(@area/(@action/(@method)))', function($area, $zone, $method, $route) {
 	$user = Flight::user();
@@ -49,6 +50,13 @@ Flight::route('/spring/', function() {
 	// This is the server interface for the node
 	$response = Flight::springApi()->request();
 	Flight::render('master_spring', array('response' => $response));
+	
+}, true);
+
+Flight::route('/gateway/', function() {
+	// This is the server interface for the node
+	$response = Flight::gatewayApi()->request();
+	Flight::render('master_json', array('response' => $response));
 	
 }, true);
 

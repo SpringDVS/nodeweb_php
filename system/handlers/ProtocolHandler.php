@@ -4,8 +4,8 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
-include 'models/NetspaceKvs.php';
-include 'models/Resolution.php';
+include __DIR__.'/../models/NetspaceKvs.php';
+include __DIR__.'/../models/Resolution.php';
 include 'RequestHandler.php';
 /**
  * The protocol handler for processing packets as a SpringDVS node
@@ -16,7 +16,7 @@ class ProtocolHandler {
 	/**
 	 * Takes the bytes of a request, processes them as a packet,
 	 * performs required actions and returns the bytes of a
-	 * serialised response packet.
+		 * serialised response packet.
 	 * 
 	 * @param bytes $bytes
 	 * @return bytes of serialised response

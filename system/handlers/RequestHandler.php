@@ -15,7 +15,7 @@ class RequestHandler {
 		}
 		$res = $url->res();
 		
-		$path = "system/modules/$res/request.php";
+		$path = "system/modules/network/$res/request.php";
 		
 		if(!file_exists($path)) {
 			$frame = new \SpringDvs\FrameResponse(SpringDvs\DvspRcode::malformed_content);

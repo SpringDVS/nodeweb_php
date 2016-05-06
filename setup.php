@@ -215,7 +215,7 @@
 						
 					</section>
 					
-					<aside class='pure-u-3-4'>
+					<aside class='pure-u-16-24'>
 						<div class="note">
 							The <strong>Springname</strong> is the unique name of this node
 							on the Spring network.
@@ -233,7 +233,7 @@
 						
 					</section>
 		
-					<aside class='pure-u-3-4'>
+					<aside class='pure-u-16-24'>
 						<div class="note">
 							The <strong>Hostname</strong> is the same as this
 							web site's address, which will be used to access this node.
@@ -254,7 +254,7 @@
 						
 					</section>
 		
-					<aside class='pure-u-3-4'>
+					<aside class='pure-u-16-24'>
 						<div class="note">
 							This will be the <strong>Password</strong> for the 
 							node administrator account
@@ -273,7 +273,7 @@
 						<img id="wait" src="/system/res/img/wait.gif" style="display: none;">
 					</section>
 					
-					<aside class='pure-u-3-4'>
+					<aside class='pure-u-16-24'>
 						<div class="note">
 							The <strong>Geosub</strong> is the local geographical network that
 							you are joining.
@@ -291,7 +291,7 @@
 						
 					</section>
 		
-					<aside class='pure-u-3-4'>
+					<aside class='pure-u-16-24'>
 						<div class="note">
 							The primary details for the network are filled out
 							automatically from the Spring network root server
@@ -307,7 +307,7 @@
 						
 					</section>
 		
-					<aside class='pure-u-3-4'>
+					<aside class='pure-u-16-24'>
 						<div class="note">
 							The <strong>Token</strong> is a 32  character string 
 							that is used to validate the registration with the 

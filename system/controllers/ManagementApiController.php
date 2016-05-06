@@ -49,7 +49,8 @@ class ManagementApiController {
 						true, 
 						SpringDvs\DvspNodeType::org, 
 						SpringDvs\DvspService::http, 
-						SpringDvs\nodereg_from_config());
+						SpringDvs\nodereg_from_config(),
+						SpringDvs\Config::$spec['token']);
 		
 		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_registration, $frame->serialise());
 		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['master'], SpringDvs\hostres_from_config());

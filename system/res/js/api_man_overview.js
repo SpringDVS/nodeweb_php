@@ -83,8 +83,9 @@ var ManOverviewController = {
             } else {
                 $("#action-error").text("Error registering on network");
             }
-        });       
+        });    
     }
+    
 };
 
 ManOverviewController.init();
