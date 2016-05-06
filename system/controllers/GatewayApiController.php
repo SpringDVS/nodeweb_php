@@ -1,9 +1,9 @@
 <?php
-include 'handlers/GatewayHandler.php';
+include __DIR__.'/../handlers/GatewayHandler.php';
 class GatewayApiController {
-	public function request() {
-		$request = Flight::request()->getBody();
-		$out = GatewayHandler::request($request);
+	public function request($service) {
+		
+		$out = GatewayHandler::request($service);
 		return $out;
 	}
 }
