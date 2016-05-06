@@ -21,10 +21,18 @@ div[class ^= "pure-u-"] > div {
     margin: 10px;
 }
 
+
 .pure-g section {
     width: 100%;
     overflow: auto;
 }
+
+section[class ^= "pure-u-"] {
+    float: left;
+    width: auto;
+    overflow: auto;
+}
+
 
 main h1 {
     margin-top: 5px;
