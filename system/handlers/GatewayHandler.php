@@ -6,13 +6,13 @@ class GatewayHandler {
 		$path = "system/modules/gateway/$service/request.php";
 		
 		if(!file_exists($path)) {
-			return json_encode(array('response' => 'error'));
+			return json_encode(array('service' => 'error'));
 		}
 		
 		$response = include "$path";
 		return json_encode(array(
-			'response' => 'ok',
-			'content' => $response
+			'service' => 'ok',
+			'response' => $response
 			));
 	}
 }

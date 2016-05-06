@@ -7,7 +7,8 @@
 class RequestHandler {
 	public static function process($urlstr) {
 		$url = new \SpringDvs\Url($urlstr);
-		if(end($url->route()) != \SpringDvs\Config::$spec['springname']) {
+		
+		if($url->route()[0] != \SpringDvs\Config::$spec['springname']) {
 			$frame = new \SpringDvs\FrameResponse(SpringDvs\DvspRcode::netspace_error);
 			return \SpringDvs\DvspPacket::ofType(
 					\SpringDvs\DvspMsgType::gsn_response, $frame->serialise()
