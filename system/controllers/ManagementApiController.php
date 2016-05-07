@@ -83,4 +83,26 @@ class ManagementApiController {
 
 		return \SpringDvs\HttpService::jsonEncodePacket($packet);
 	}
+	
+	private function gwservicesGet() {
+		return json_encode($this->extractServices('system/modules/gateway/'));
+	}
+	
+	private function nwservicesGet() {
+		return json_encode($this->extractServices('system/modules/network/'));
+	}
+	
+	private function extractServices($root) {
+		$dirs = array_filter(glob($root.'/*'), 'is_dir');
+		$result = array();
+		foreach($dirs as $d) {
+			$path = $d.'/info.php';
+			if(!file_exists($path)) continue;
+			
+			$r = include $path;
+			if(!is_array($r)) continue;
+			$result[] = $r;
+		}
+		return $result;		
+	}
 }
