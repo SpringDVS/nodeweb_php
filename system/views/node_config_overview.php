@@ -3,9 +3,14 @@
 <div class="pure-u-3-5">
 	
 	<div class="white-container raised">
-		<h3>Tasks</h3>
+		<h3>Network Services</h3>
+		Various services that your node exposes on the Spring network.
 	</div>
 	
+	<div class="white-container raised">
+		<h3>Gateway Services</h3>
+		Various services that enable access to the Spring network through the node.
+	</div>
 </div>
 
 <div class="pure-u-2-5">

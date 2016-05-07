@@ -46,15 +46,13 @@ main h1 {
     top: 15px;
     right: 10px;
     z-index: -1024;
-    
-    
 }
 
 div.white-container {
     background-color: rgba(247,247,247,0.7);
     border-radius: 5px;
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 20px !important;
 }
 
 div.raised {
