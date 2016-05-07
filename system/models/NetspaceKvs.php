@@ -13,12 +13,13 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	public function __construct($unitTest = false, $testDir = "") {
 		$options = array();
 		if( $unitTest ) {
-			$options['dir'] = $testDir;
+			$options['dir'] = SpringDvs\Config::$sys['store_test'];
 		} else {
-			// Actual init
+			$options['dir'] = SpringDvs\Config::$sys['store_live'];
 		}
-		$this->geosubNetspace = new Flintstone('gsn_testunit', $options);
-		$this->geotopNetspace = new Flintstone('gtn_testunit', $options);
+
+		$this->geosubNetspace = new Flintstone('node_geosub', $options);
+		$this->geotopNetspace = new Flintstone('node_geotop', $options);
 	}
 
 
