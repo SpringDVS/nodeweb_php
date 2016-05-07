@@ -15,7 +15,7 @@ Flight::register('manApi', 'ManagementApiController');
 Flight::register('springApi', 'SpringApiController');
 Flight::register('gatewayApi', 'GatewayApiController');
 
-Flight::route('/node/(@area/(@action/(@method)))', function($area, $zone, $method, $route) {
+Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $zone, $method, $service, $route) {
 	$user = Flight::user();
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
@@ -23,7 +23,9 @@ Flight::route('/node/(@area/(@action/(@method)))', function($area, $zone, $metho
 	// ToDo:
 	// Check login here!!
 	// This is all administration for the node
-
+	
+	define('NODE_ADMIN', true); // We are in admin mode
+	
 	switch($area) {
 	case 'api':
 		$api = Flight::manApi();
@@ -34,7 +36,22 @@ Flight::route('/node/(@area/(@action/(@method)))', function($area, $zone, $metho
 	case 'network':
 		Flight::render('node_config_netman', null, 'body_content');
 		break;
+	
+	case 'service':
+		$file = __DIR__."/modules/".$zone."/".$method."/config/view.php";
+		
+		if(!file_exists($file)) {
+			Flight::render('error', null, 'body_content');
+			break;
+		}
+		Flight::render($file, null, 'body_content');
+		
+		$script = "/modules/".$zone."/".$method."/config/client.js";
+		if(file_exists(__DIR__.$script)) {
+			$scriptsTop[] = "../..".$script;
+		}
 
+		break;
 	default:
 		$scriptsBottom[] = "api_man_overview.js";
 		Flight::render('node_config_overview', null, 'body_content');
