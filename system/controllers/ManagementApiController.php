@@ -26,7 +26,11 @@ class ManagementApiController {
 		}
 
 		if(!method_exists($this, $method)) return array();
+		$ref = new ReflectionMethod('ManagementApiController', $method);
 		
+		if($ref->getNumberOfParameters() == 1) {
+			return $this->$method($func['service']);
+		} 
 		return $this->$method();
 	}
 	
@@ -104,5 +108,16 @@ class ManagementApiController {
 			$result[] = $r;
 		}
 		return $result;		
+	}
+	
+	private function nwserviceGet($service) {
+		return $this->networkService($service, 'pull');
+	}
+	private function nwservicePush($service) {
+		return $this->networkService($service, 'push');
+	}
+	
+	private function networkService($service, $method) {
+		return json_encode(array($service => $method));
 	}
 }
