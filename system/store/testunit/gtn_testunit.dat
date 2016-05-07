@@ -1,3 +1,0 @@
-SpringLocal__homegeo=a:5:{s:8:"hostname";s:9:"Localhost";s:7:"address";s:9:"127.0.0.1";s:7:"service";i:1;s:8:"priority";i:0;s:6:"geosub";s:7:"homegeo";}
-SpringAlt__homegeo=a:5:{s:8:"hostname";s:8:"Localalt";s:7:"address";s:9:"127.0.0.1";s:7:"service";i:0;s:8:"priority";i:0;s:6:"geosub";s:7:"homegeo";}
-woodsage__esusx=a:5:{s:8:"hostname";s:31:"woodsage.spring-dvs.org/spring/";s:7:"address";s:14:"217.194.223.50";s:7:"service";i:1;s:8:"priority";i:0;s:6:"geosub";s:5:"esusx";}
