@@ -129,6 +129,7 @@
 				return true;
 			}));
 
+			if(!checkEmptyElement("#store", "#FFFFFF")) complete = false;
 			
 			if(!complete) {
 				$("#errors").text("There are errors in the form");
@@ -157,7 +158,8 @@
 				+ "&primary-hostname=" + $("#primary-hostname").val()
 				+ "&primary-service=" + $("#primary-service").val()
 				+ "&primary-address=" + $("#primary-address").val()
-				+ "&token=" + $("#token").val();
+				+ "&token=" + $("#token").val()
+				+ "&store=" + $("#store").val();
 		
 			$.post("?generate=true",postStr, function(data) {
 				if(data == "ok"){
@@ -229,7 +231,9 @@
 					<section class="pure-u-1-4">
 						
 						<label for="hostname">Hostname:</label>
-						<input id="hostname" type="text" placeholder="">
+						<input id="hostname" type="text" placeholder="" value="<?php
+						echo $_SERVER['HTTP_HOST'];
+						?>">
 						
 					</section>
 		
@@ -326,6 +330,28 @@
 						</div>
 						
 					</section>
+					
+					<div class="pure-1-1" style="clear: both;">&nbsp</div>
+					<legend class="pure-u-1-1"><strong>Database</strong></legend>
+					<section class="pure-u-1-4">
+						
+						<label for="store">Store:</label>
+						<textarea id="store"><?php 
+						echo __DIR__; 
+						?></textarea>
+						
+					</section>
+		
+					<aside class='pure-u-16-24'>
+						<div class="note">
+							The <strong>Store</strong> location is where the node's
+							self-contained database is held. This <em>must</em> be
+							outside the <code>public_html</code> folder (or equivalent), 
+							usually the directory above. The current directory 
+							is provided as a start.
+						</div>
+					</aside>
+					
 				</fieldset>
 				
 				<button onclick="generate()">Generate Configuration</button>
@@ -337,6 +363,7 @@
 	
 			</div>
 
+			
 		<?php
 		return ob_get_clean();
 	}
@@ -351,7 +378,8 @@
 		$primaryAddress = filter_input(INPUT_POST, 'primary-address');
 		$primaryService = filter_input(INPUT_POST, 'primary-service');
 		$token = filter_input(INPUT_POST, 'token');
-		
+		$store = filter_input(INPUT_POST, 'store');
+		$store .= "/gsnstore";
 		$text = "
 <?php
 	\SpringDvs\Config::\$spec['springname'] = \"$springname\";
@@ -365,6 +393,10 @@
 	\SpringDvs\Config::\$net['geosub'] = \"$geosub\";
 	\SpringDvs\Config::\$net['geotop'] = \"uk\";
 	\SpringDvs\Config::\$spec['testing'] = false;
+	
+	\SpringDvs\Config::\$sys['store'] = \"$store\";
+	\SpringDvs\Config::\$sys['store_live'] = \"$store/live\";
+	\SpringDvs\Config::\$sys['store_test'] = \"$store/test\";
 ";
 		$fp = fopen("system/config.php", 'w');
 		if(!$fp) {
@@ -372,7 +404,9 @@
 		}
 		fwrite($fp, $text);
 		fclose($fp);
-		
+		mkdir($store);
+		mkdir($store."/test");
+		mkdir($store."/live");
 		return "ok";
 		
 	}
