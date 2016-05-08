@@ -67,7 +67,8 @@ Flight::route('/spring/', function() {
 	
 }, true);
 
-Flight::route('/gateway/(@service/)', function($service) {
+Flight::route('/gateway/@service/*', function($service, $route) {
+	
 	// This is the gateway interface for the node
 	
 	$response = Flight::gatewayApi()->request($service);
