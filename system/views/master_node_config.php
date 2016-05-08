@@ -17,7 +17,7 @@
 	<?php 
 	if(isset($scriptsTop)) {
 		foreach($scriptsTop as $s) {
-			echo "<script type=\"text/javascript\" src=\"/system/res/js/$s\"></script>\n";
+			echo "<script async type=\"text/javascript\" src=\"/system/res/js/$s\"></script>\n";
 		}
 	}
 	?>
