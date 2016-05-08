@@ -3,4 +3,10 @@
  * Author:  Charlie Fyvie-Gauld <cfg@zunautica.org>
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
-if(!defined('NODE_ADMIN')) die("{}");
+use Flintstone\Flintstone;
+if(!defined('SPRING_IF')) return [];
+$options['dir'] = SpringDvs\Config::$sys['store_live'];
+$db = new Flintstone('netservice_bulletin', $options);
+$bulletins = $db->getAll();
+
+return array_values($bulletins);

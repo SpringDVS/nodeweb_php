@@ -6,8 +6,10 @@
 
 class SpringApiController {
 	public function request() {
-		$request = Flight::request()->getBody();
+		$request = trim(Flight::request()->getBody());
+		
 		$in = SpringDvs\hex_to_bin($request);
+		define('SPRING_IF', true);
 		$out = ProtocolHandler::processBytes($in);
 		
 		return \SpringDvs\bin_to_hex($out);

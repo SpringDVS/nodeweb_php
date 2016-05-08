@@ -7,7 +7,7 @@
 class RequestHandler {
 	public static function process($urlstr) {
 		$url = new \SpringDvs\Url($urlstr);
-		
+	
 		if($url->route()[0] != \SpringDvs\Config::$spec['springname']) {
 			$frame = new \SpringDvs\FrameResponse(SpringDvs\DvspRcode::netspace_error);
 			return \SpringDvs\DvspPacket::ofType(
@@ -15,9 +15,9 @@ class RequestHandler {
 			);
 		}
 		$res = $url->res();
-		
+	
 		$path = "system/modules/network/$res/request.php";
-		
+
 		if(!file_exists($path)) {
 			$frame = new \SpringDvs\FrameResponse(SpringDvs\DvspRcode::malformed_content);
 			return \SpringDvs\DvspPacket::ofType(
