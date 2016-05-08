@@ -19,7 +19,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	$user = Flight::user();
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
-	
+	$masterView = 'master_node_config';
 	// ToDo:
 	// Check login here!!
 	// This is all administration for the node
@@ -33,10 +33,6 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 		Flight::render('master_json', array('json' => $json));
 		return;
 
-	case 'network':
-		Flight::render('node_config_netman', null, 'body_content');
-		break;
-	
 	case 'service':
 		$file = __DIR__."/modules/".$zone."/".$method."/config/view.php";
 		
@@ -53,11 +49,11 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 
 		break;
 	default:
-		$scriptsBottom[] = "api_man_overview.js";
+		$scriptsTop[] = "api_man_overview.js";
 		Flight::render('node_config_overview', null, 'body_content');
 	}
 	
-	Flight::render('master_node_config', array(
+	Flight::render($masterView, array(
 										'scriptsTop' => $scriptsTop,
 										'scriptsBottom' => $scriptsBottom,
 				));
