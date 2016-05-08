@@ -25,7 +25,7 @@ class ManagementApiController {
 				break;
 		}
 
-		if(!method_exists($this, $method)) return array();
+		if(!method_exists($this, $method)) return json_encode(array());
 		$ref = new ReflectionMethod('ManagementApiController', $method);
 		
 		if($ref->getNumberOfParameters() == 1) {
@@ -111,13 +111,20 @@ class ManagementApiController {
 	}
 	
 	private function nwserviceGet($service) {
-		return $this->networkService($service, 'pull');
+		return $this->networkService($service, 'Get');
 	}
-	private function nwservicePush($service) {
-		return $this->networkService($service, 'push');
+	private function nwservicePost($service) {
+		return $this->networkService($service, 'Post');
 	}
 	
 	private function networkService($service, $method) {
-		return json_encode(array($service => $method));
+		$file = "system/modules/network/$service/config/controller.php";
+		
+		if( !file_exists($file) ) {
+			return json_encode(array("service" => "error"));
+		}
+		include $file;
+		$controller = new ServiceController();
+		return $controller->request($method);
 	}
 }
