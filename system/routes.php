@@ -10,19 +10,31 @@ include 'system/controllers/SpringApiController.php';
 include 'system/controllers/GatewayApiController.php';
 include 'system/handlers/ProtocolHandler.php';
 
-Flight::register('user', 'User');
 Flight::register('manApi', 'ManagementApiController');
 Flight::register('springApi', 'SpringApiController');
 Flight::register('gatewayApi', 'GatewayApiController');
 
 Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $zone, $method, $service, $route) {
+	
+	session_start();
+	
 	$user = Flight::user();
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
 	$masterView = 'master_node_config';
-	// ToDo:
-	// Check login here!!
-	// This is all administration for the node
+	if(!isset($_SESSION['admin'])) {
+		$v = check_login();
+		if($v < 2) {
+			Flight::render('node_login', ['passState' => $v], 'body_content');
+			Flight::render('master_general', array(
+										'scriptsTop' => [],
+										'scriptsBottom' => [],
+				));
+			return;
+		}
+	}
+	
+	
 	
 	define('NODE_ADMIN', true); // We are in admin mode
 	
@@ -47,6 +59,11 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 			$scriptsTop[] = "../..".$script;
 		}
 
+		break;
+		
+	case 'logout':
+		unset($_SESSION['admin']);
+		Flight::redirect('/node/');
 		break;
 	default:
 		$scriptsTop[] = "api_man_overview.js";

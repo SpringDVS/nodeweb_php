@@ -4,13 +4,14 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
-class User {
-	private $id;
-	public function __construct() {
-		$this->id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
-	}
+function check_login() {
+	$check = filter_input(INPUT_POST, 'form-password');
+	if($check == null) {
+		return 0; // Nothing
+	} else if($check != \SpringDvs\Config::$spec['password']) {
+		return 1; // Failed
+	} 
 	
-	public function id() {
-		return $this->id;
-	}
+	$_SESSION['admin'] = true;
+	return 2; // Passed
 }

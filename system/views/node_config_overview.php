@@ -67,7 +67,7 @@
 		<button id="action-register" style="margin-top: 10px;">Register</button>
 		<div id="action-error" style="color: #e9322d; font-weight: bold; margin-top:10px;"></div>
 	</div>
-		
+	<div class="white-container raised"><button onclick="location.href='/node/logout/';">Logout</button></div>	
 	</div>
 </div>
 	

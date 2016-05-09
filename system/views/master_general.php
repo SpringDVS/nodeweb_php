@@ -30,13 +30,8 @@
 		<!-- <h4>Node Management</h4> -->
 	</header>
 	<main class="pure-u-1-1 pure-g">
-		<section>			
-			<h1>Node Management</h1>
-		</section>
-		
 		<?php echo $body_content; ?>
 	</main>
-	
 </div>
 	
 </body>
