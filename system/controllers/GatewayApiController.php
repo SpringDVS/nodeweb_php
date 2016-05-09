@@ -4,7 +4,7 @@ class GatewayApiController {
 	public function request($service) {
 		
 		$out = GatewayHandler::request($service);
-		$callback = filter_input(INPUT_GET, '__cb');
+		$callback = filter_input(INPUT_GET, 'callback');
 		if($callback) {
 			$out = "$callback($out);";
 		}
