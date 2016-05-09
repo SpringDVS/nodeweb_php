@@ -32,9 +32,16 @@ if(!$in){ return ['status' => 'error', 'uri' => $request]; }
 if($in->header()->type == SpringDvs\DvspMsgType::gsn_response){ return ['status' => 'error', 'uri' => $request]; }
 if($in->header()->type != SpringDvs\DvspMsgType::gsn_response_high){ return ['status' => 'error', 'uri' => $request]; }
 
+$v = explode('|', $in->content());
+$nodes = array();
+foreach($v as $k => $val) {
+	if($val == "") continue;
+	$nodes[$k] = json_decode($val);
+}
+
 $dec = [
 	"status" => "ok",
-	"content" => json_decode($in->content())
+	"content" => $nodes
 	];
 
 return $dec;
