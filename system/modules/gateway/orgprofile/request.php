@@ -13,7 +13,8 @@ unset($qs['__meta']);unset($qs['__req']);unset($qs['_']);unset($qs['callback']);
 
 $qdata = count($qs) ? "?".http_build_query($qs) : "";
 
-$request = "spring://".$uri."/bulletin/".$qdata;
+$request = "spring://".$uri."/orgprofile/".$qdata;
+
 
 $packet = SpringDvs\DvspPacket::ofType(\SpringDvs\DvspMsgType::gsn_resolution, $request);
 
@@ -33,6 +34,7 @@ if($in->header()->type == SpringDvs\DvspMsgType::gsn_response){ return ['status'
 if($in->header()->type != SpringDvs\DvspMsgType::gsn_response_high){ return ['status' => 'error', 'uri' => $request]; }
 
 $v = explode('|', $in->content());
+
 $nodes = array();
 foreach($v as $k => $val) {
 	if($val == "") continue;

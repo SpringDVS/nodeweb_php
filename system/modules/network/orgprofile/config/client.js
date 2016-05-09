@@ -25,8 +25,7 @@ var OrgProfileModel = function () {
         console.log(profile.asString());
         $.post(
             '/node/api/nwservice/push/orgprofile/?task=update',
-            profile.asString(),
-            
+            profile.asString(),    
             function(data){
                self.requestProfile();
             }

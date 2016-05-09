@@ -6,7 +6,7 @@
 use Flintstone\Flintstone;
 if(!defined('SPRING_IF')) return [];
 $options['dir'] = SpringDvs\Config::$sys['store_live'];
-$db = new Flintstone('netservice_bulletin', $options);
+$db = new Flintstone('netservice_orgprofile', $options);
 $profile = $db->get('profile');
 
-return array_values($profile);
+return $profile;
