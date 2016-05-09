@@ -12,7 +12,7 @@ class GatewayHandler {
 		$response = include "$path";
 		
 		return json_encode(
-				array_merge(['service' => 'ok'],$response)
+				array_merge(['service' => $service],$response)
 			);
 	}
 }
