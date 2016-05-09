@@ -10,9 +10,9 @@ class GatewayHandler {
 		}
 		
 		$response = include "$path";
-		return json_encode(array(
-			'service' => 'ok',
-			'response' => $response
-			));
+		
+		return json_encode(
+				array_merge(['service' => 'ok'],$response)
+			);
 	}
 }
