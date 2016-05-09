@@ -1,57 +1,41 @@
 <?php
-use Flintstone\Flintstone;
-$options['dir'] = SpringDvs\Config::$sys['store_live'];
-$db = new Flintstone('gateservice_bulletin', $options);
 
 
-$uri = filter_input(INPUT_GET, "req");
-if(!$uri) return "Bad Request";
 
-$request = $db->get($uri);
+$uri = filter_input(INPUT_GET, "__req");
 
-if(!$request) return "Bad Request";
+if(!$uri) {
+	$uri = \SpringDvs\Config::$net['geosub'].'.'.\SpringDvs\Config::$net['geotop'];
+}
 
-$request .= "/bulletin/";
+$qs = $_GET;
+unset($qs['__meta']);unset($qs['__req']);unset($qs['_']);unset($qs['callback']);
+
+$qdata = count($qs) ? "?".http_build_query($qs) : "";
+
+$request = "spring://".$uri."/bulletin/".$qdata;
+
 $packet = SpringDvs\DvspPacket::ofType(\SpringDvs\DvspMsgType::gsn_resolution, $request);
 
-$resp = SpringDvs\HttpService::sendPacket($packet, \SpringDvs\Config::$net['master'],  SpringDvs\hostres_from_config());
-if(!$resp) return "error";
-if($resp->header()->type == SpringDvs\DvspMsgType::gsn_response) {
-	$frame = $resp->contentAs(SpringDvs\FrameResponse::contentType());
-	
-	switch($frame->code) {
-		case \SpringDvs\DvspRcode::netspace_error : return "NetspaceError";
-		case \SpringDvs\DvspRcode::network_error : return "NetworkError";
-	} 
-}
+$status = SpringDvs\HttpService::sendPacket($packet, \SpringDvs\Config::$net['master'],  SpringDvs\hostres_from_config());
 
-if($resp->header()->type != SpringDvs\DvspMsgType::gsn_response_node_info) {
-	
-	return "Unexpected result";
-}
+if(!$status){ return ['status' => 'error', 'uri' => $request]; }
+if($status->header()->type == SpringDvs\DvspMsgType::gsn_response){ return ['status' => 'error', 'uri' => $request]; }
 
-$frame = $resp->contentAs(\SpringDvs\FrameNodeInfo::contentType());
+$frame = $status->contentAs(\SpringDvs\FrameNodeInfo::contentType());
 $node = \SpringDvs\Node::fromNoderegAddr($frame->name, $frame->address);
 $rqpacket = SpringDvs\DvspPacket::ofType(\SpringDvs\DvspMsgType::gsn_request, $request);
 
 
 $in = SpringDvs\HttpService::sendPacket($rqpacket, \SpringDvs\Node::addressToString($node->address()),  $node->hostname()."/spring/");
+if(!$in){ return ['status' => 'error', 'uri' => $request]; }
+if($in->header()->type == SpringDvs\DvspMsgType::gsn_response){ return ['status' => 'error', 'uri' => $request]; }
+if($in->header()->type != SpringDvs\DvspMsgType::gsn_response_high){ return ['status' => 'error', 'uri' => $request]; }
 
-if($in->header()->type == SpringDvs\DvspMsgType::gsn_response) {
-	$f = $in->contentAs(SpringDvs\FrameResponse::contentType());
-	
-	switch($f->code) {
-		case \SpringDvs\DvspRcode::netspace_error : return "NetspaceError";
-		case \SpringDvs\DvspRcode::network_error : return "NetworkError";
-		case \SpringDvs\DvspRcode::malformed_content : return "MalformedContent";
-	} 
-}
-
-if($in->header()->type != SpringDvs\DvspMsgType::gsn_response_high) {
-	return "Unexpected result";
-}
-
-$dec = json_decode($in->content());
+$dec = [
+	"status" => "ok",
+	"content" => json_decode($in->content())
+	];
 
 return $dec;
 
