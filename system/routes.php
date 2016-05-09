@@ -58,7 +58,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 		if(file_exists(__DIR__.$script)) {
 			$scriptsTop[] = "../..".$script;
 		}
-
+		$masterView = 'master_service_config';
 		break;
 		
 	case 'logout':
