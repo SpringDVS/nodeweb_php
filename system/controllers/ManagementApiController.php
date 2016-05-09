@@ -45,6 +45,8 @@ class ManagementApiController {
 			'geosub' => \SpringDvs\Config::$net['geosub'] . '.' . \SpringDvs\Config::$net['geotop'],
 			'status' => "Unknown",
 			'register' => "Unregistered",
+			'nwservices' => [],
+			'gwservices' => [],
 		) );
 	}
 	

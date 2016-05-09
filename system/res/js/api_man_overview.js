@@ -6,8 +6,6 @@
 var ManOverviewController = {
     self: this,
     viewModel: null,
-
-
     refreshDetails: function() {
         $.getJSON('/node/api/overview/get', function(data) {
             ManOverviewController.viewModel =  ko.mapping.fromJS(data);
@@ -69,7 +67,10 @@ var ManOverviewController = {
             ManOverviewController.viewModel =  ko.mapping.fromJS(data);
             ko.applyBindings( ManOverviewController.viewModel );
             ManOverviewController.refreshStatus();
+            ManOverviewController.requestServices();
         });
+        
+        
     },
     
     actionRegister: function() {
@@ -84,12 +85,19 @@ var ManOverviewController = {
                 $("#action-error").text("Error registering on network");
             }
         });    
+    },
+    
+    requestServices: function () {
+        
+        $.getJSON('/node/api/nwservices/pull/', function(data) {
+            ManOverviewController.viewModel.nwservices(data);
+        }); 
+        
+        $.getJSON('/node/api/gwservices/pull/', function(data) {
+            ManOverviewController.viewModel.gwservices(data);
+        }); 
     }
     
 };
 
 ManOverviewController.init();
-
-
-
-

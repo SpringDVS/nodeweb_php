@@ -5,11 +5,28 @@
 	<div class="white-container raised">
 		<h3>Network Services</h3>
 		Various services that your node exposes on the Spring network.
+		<table class="pure-table pure-table-striped" style="margin-top: 10px;">
+			<tbody data-bind="foreach: nwservices">
+				<tr>
+					<td style="font-weight: bold;" data-bind="text: title"></td>
+					<td data-bind="text: description"></td>
+					<td> <a style="text-decoration: none;" data-bind="attr: {'href':'/node/service/network/'+module+'/'}">Config</a></td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 	
 	<div class="white-container raised">
 		<h3>Gateway Services</h3>
-		Various services that enable access to the Spring network through the node.
+		Providing public facing services through the node.
+		<table class="pure-table pure-table-striped" style="margin-top: 10px;">
+			<tbody data-bind="foreach: gwservices">
+				<tr>
+					<td style="font-weight: bold;" data-bind="text: title"></td>
+					<td data-bind="text: description"></td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
 
