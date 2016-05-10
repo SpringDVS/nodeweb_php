@@ -17,17 +17,21 @@ parse_str($url->query(), $queries);
 if(isset($queries['tags'])) {
 
 	$qtags = explode(',', $queries['tags']);
-	foreach($bulletins as $key => $value) {
+	foreach($bulletins as $key => &$value) {
 		$tags = explode(',', $value['tags']);
 		foreach($tags as $tag) {
 			if(in_array(trim($tag), $qtags)){ 
+				$value['tags'] = $tags;
 				$final[$key] = $value; 
-				
 			}
 		}
 	}
 
 } else {
+	foreach($bulletins as $key => &$value) {
+		$tags = explode(',', $value['tags']);
+		$value['tags'] = $tags;
+	}
 	$final = $bulletins;
 }
 
