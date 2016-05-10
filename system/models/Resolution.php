@@ -8,8 +8,10 @@ class Resolution {
 	public static function resolveUrl($urlstr, NetspaceKvs &$nio) {
 		
 		$url = new \SpringDvs\Url($urlstr);
-		if(!empty($url->gtn())) {
-			if(!empty($url->glq())) {
+		$gtn = $url->gtn();
+		if(!empty($gtn)) {
+			$glq = $url->glq();
+			if(!empty($glq)) {
 				// Handle Geloc
 			} else {
 				// Don't need no stinkin' GTN

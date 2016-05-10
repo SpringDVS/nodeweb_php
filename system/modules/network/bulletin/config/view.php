@@ -22,6 +22,9 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 					<td data-bind="text: title"></td>
 					<td style="text-align: right;"><a href="#" data-bind="click: $root.removeBulletin">remove</a></td>
 				</tr>
+				<tr>
+					<td style="font-size: 12px;" colspan="3" data-bind="text: tags"></td>
+				</tr>
 			</tbody>
 		</table>
 	</div>
@@ -40,6 +43,8 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 					<option value="notice">Notice</option>
 					<option value="service">Service</option>
 				</select>
+				<label for="bf-tags">Tags</label>
+				<input id="bf-tags" type="text">
 			</fieldset>
 		</form>
 		<button onclick="buForm.send()">Add</button>

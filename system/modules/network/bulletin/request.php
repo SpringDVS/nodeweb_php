@@ -7,6 +7,28 @@ use Flintstone\Flintstone;
 if(!defined('SPRING_IF')) return [];
 $options['dir'] = SpringDvs\Config::$sys['store_live'];
 $db = new Flintstone('netservice_bulletin', $options);
-$bulletins = $db->getAll();
 
-return array_values($bulletins);
+$bulletins = $db->getAll();
+$final = [];
+$queries = [];
+
+parse_str($url->query(), $queries);
+
+if(isset($queries['tags'])) {
+
+	$qtags = explode(',', $queries['tags']);
+	foreach($bulletins as $key => $value) {
+		$tags = explode(',', $value['tags']);
+		foreach($tags as $tag) {
+			if(in_array(trim($tag), $qtags)){ 
+				$final[$key] = $value; 
+				
+			}
+		}
+	}
+
+} else {
+	$final = $bulletins;
+}
+
+return array_values($final);

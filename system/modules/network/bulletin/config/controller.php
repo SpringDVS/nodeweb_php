@@ -26,7 +26,8 @@ class ServiceController {
 	private function newPost() {
 		$input = [
 			'title' => filter_input(INPUT_POST, 'title'),
-			'type' => filter_input(INPUT_POST, 'type')
+			'type' => filter_input(INPUT_POST, 'type'),
+			'tags' => filter_input(INPUT_POST, 'tags')
 		];
 
 		$this->db->set((int)(time()/10), $input);

@@ -45,13 +45,15 @@ var BulletinListModel = function () {
 };
 
 
-var Bulletin = function(title, type) {
+var Bulletin = function(title, type,tags) {
     this.title = title;
     this.type = type;
+    this.tags = tags;
     
     this.asString = function() {
         return "title=" + this.title +
-            "&type=" + this.type;
+            "&type=" + this.type +
+            "&tags=" + this.tags;
     };
 }
 
@@ -63,11 +65,13 @@ var BulletinListForm = function (model) {
         
         b = new Bulletin(
                 $("#bf-title").val(),
-                $("#bf-type").val()
+                $("#bf-type").val(),
+                $("#bf-tags").val()
             );
     
         self.model.newBulletin(b);
         $("#bf-title").val("");
+        $("#bf-tags").val("");
     }
 }
 
