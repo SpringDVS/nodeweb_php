@@ -84,7 +84,17 @@
 		<button id="action-register" style="margin-top: 10px;">Register</button>
 		<div id="action-error" style="color: #e9322d; font-weight: bold; margin-top:10px;"></div>
 	</div>
-	<div class="white-container raised"><button onclick="location.href='/node/logout/';">Logout</button></div>	
+	<div class="white-container raised">
+		<table class="pure-table pure-table-bordered">
+		<tbody>
+			<tr>
+				<td><strong>Remote API Token</strong></td>
+				<td><?php echo \SpringDvs\Config::$sys['api_token']; ?></td>
+			</tr>
+		</tbody>
+		</table>
+		<br>
+		<button onclick="location.href='/node/logout/';">Logout</button></div>	
 	</div>
 </div>
 	

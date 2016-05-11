@@ -380,6 +380,7 @@
 		$token = filter_input(INPUT_POST, 'token');
 		$store = filter_input(INPUT_POST, 'store');
 		$store .= "/gsnstore";
+		$apiToken = md5(microtime());
 		$text = "
 <?php
 	\SpringDvs\Config::\$spec['springname'] = \"$springname\";
@@ -397,6 +398,7 @@
 	\SpringDvs\Config::\$sys['store'] = \"$store\";
 	\SpringDvs\Config::\$sys['store_live'] = \"$store/live\";
 	\SpringDvs\Config::\$sys['store_test'] = \"$store/test\";
+	\SpringDvs\Config::\$sys['api_token'] = \"$apiToken\";
 ";
 		$fp = fopen("system/config.php", 'w');
 		if(!$fp) {

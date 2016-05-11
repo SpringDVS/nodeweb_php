@@ -22,6 +22,19 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
 	$masterView = 'master_node_config';
+	if( ($token = filter_input(INPUT_GET, '__token')) !== null) {
+		if($token == \SpringDvs\Config::$sys['api_token'] && $area == 'api') {
+			define('NODE_ADMIN', true); // We are in admin mode
+			$api = Flight::manApi();
+			$json = $api->request($route->params);
+			Flight::render('master_json', array('json' => $json));
+			return;
+		}
+
+		Flight::render('master_json', array('json' => 'unauthorised'));
+		return;	
+	}
+	
 	if(!isset($_SESSION['admin'])) {
 		$v = check_login();
 		if($v < 2) {
@@ -37,6 +50,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	
 	
 	define('NODE_ADMIN', true); // We are in admin mode
+	define('NODE_LOCAL', true); // We are working on the local system
 	
 	switch($area) {
 	case 'api':

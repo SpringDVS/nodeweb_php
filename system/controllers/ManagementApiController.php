@@ -20,7 +20,7 @@ class ManagementApiController {
 				$method = $func['action'] . "Post";
 				break;
 			default:
-				return array();
+				return "{}";
 				
 				break;
 		}
@@ -35,6 +35,8 @@ class ManagementApiController {
 	}
 	
 	private function overviewGet() {
+		if(!defined('NODE_LOCAL')) return [];
+		
 		return json_encode( array(
 			'springname' => \SpringDvs\Config::$spec['springname'],
 			'hostname' => \SpringDvs\Config::$spec['hostname'],
@@ -51,6 +53,7 @@ class ManagementApiController {
 	}
 	
 	private function registerPost() {
+		if(!defined('NODE_LOCAL')) return "{}";
 		$frame = new SpringDvs\FrameRegistration(
 						true, 
 						SpringDvs\DvspNodeType::org, 
@@ -64,6 +67,8 @@ class ManagementApiController {
 	}
 	
 	private function statePost() {
+		if(!defined('NODE_LOCAL')) return '{}';
+		
 		if(!isset($_GET['state'])) return "{}";
 		
 		$state = $_GET['state'];
@@ -78,6 +83,8 @@ class ManagementApiController {
 	}
 	
 	private function stateGet() {
+		if(!defined('NODE_LOCAL')) return "{}";
+
 		$springname = \SpringDvs\Config::$spec['springname'];
 		
 		if(isset($_GET['springname'])) $springname = $_GET['springname'];
