@@ -36,7 +36,7 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 		<form class="pure-form pure-form-stacked">
 			<fieldset>
 				<label for="bf-title">Title</label>
-				<input id="bf-title" type="text">
+				<input id="bf-title" type="text" style="width:100%;">
 				<label for="bf-type">Type</label>
 				<select id="bf-type">
 					<option value="event">Event</option>
@@ -44,7 +44,9 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 					<option value="service">Service</option>
 				</select>
 				<label for="bf-tags">Tags</label>
-				<input id="bf-tags" type="text">
+				<input id="bf-tags" type="text" style="width:60%;" placeholder="tag1,tag2,tag3">
+				<small>Separate with commas</small>
+
 			</fieldset>
 		</form>
 		<button onclick="buForm.send()">Add</button>
