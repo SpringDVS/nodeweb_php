@@ -31,7 +31,7 @@ class ServiceController {
 		];
 
 		$this->db->set((int)(time()/10), $input);
-		return json_enode(['result' => 'ok']);
+		return json_encode(['result' => 'ok']);
 	}
 	
 	private function remPost() {
