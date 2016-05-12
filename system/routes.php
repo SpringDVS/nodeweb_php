@@ -21,8 +21,9 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	$user = Flight::user();
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
+	
 	$masterView = 'master_node_config';
-	if( ($token = filter_input(INPUT_GET, '__token')) !== null) {
+	if( ($token = filter_input(INPUT_POST, '__token')) !== null) {
 		if($token == \SpringDvs\Config::$sys['api_token'] && $area == 'api') {
 			define('NODE_ADMIN', true); // We are in admin mode
 			$api = Flight::manApi();
