@@ -52,6 +52,13 @@ class ManagementApiController {
 		) );
 	}
 	
+	private function springnetGet() {
+		return json_encode([
+			'springname' => \SpringDvs\Config::$spec['springname'],
+			'network' => \SpringDvs\Config::$net['geosub'] . '.' . \SpringDvs\Config::$net['geotop']
+				]);
+	}
+	
 	private function registerPost() {
 		if(!defined('NODE_LOCAL')) return "{}";
 		$frame = new SpringDvs\FrameRegistration(
