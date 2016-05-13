@@ -43,7 +43,7 @@ class ManagementApiController {
 			'service' => \SpringDvs\Config::$net['service'],
 			'address' => $_SERVER['SERVER_ADDR'],
 			
-			'master_addr' => \SpringDvs\Config::$net['master'],
+			'primary_addr' => \SpringDvs\Config::$net['master'],
 			'geosub' => \SpringDvs\Config::$net['geosub'] . '.' . \SpringDvs\Config::$net['geotop'],
 			'status' => "Unknown",
 			'register' => "Unregistered",

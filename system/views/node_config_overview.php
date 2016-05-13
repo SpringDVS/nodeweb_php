@@ -66,8 +66,8 @@
 				<td data-bind="text: geosub"></td>
 			</tr>
 			<tr>
-				<td><strong>Master Address:</strong></td>
-				<td data-bind="text: master_addr"></td>
+				<td><strong>Primary Address:</strong></td>
+				<td data-bind="text: primary_addr"></td>
 			</tr>
 			<tr>
 				<td><strong>Status:</strong></td>
