@@ -409,6 +409,7 @@
 		mkdir($store);
 		mkdir($store."/test");
 		mkdir($store."/live");
+		mkdir($store."/cache");
 		return "ok";
 		
 	}

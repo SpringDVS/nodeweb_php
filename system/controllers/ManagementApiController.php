@@ -24,7 +24,7 @@ class ManagementApiController {
 				
 				break;
 		}
-
+		
 		if(!method_exists($this, $method)) return json_encode(array());
 		$ref = new ReflectionMethod('ManagementApiController', $method);
 		
@@ -57,6 +57,36 @@ class ManagementApiController {
 			'springname' => \SpringDvs\Config::$spec['springname'],
 			'network' => \SpringDvs\Config::$net['geosub'] . '.' . \SpringDvs\Config::$net['geotop']
 				]);
+	}
+	
+	private function updatesGet() {
+		$checker = new UpdateCheck();
+		$queue = $checker->getUpdateQueue();
+		foreach($queue as &$type) {
+			foreach($type as &$details) {
+				unset($details['sha1']);
+			}
+		}
+		
+		return json_encode($queue);
+	}
+	
+	private function updatesPost($service) {
+		include 'system/updater/UpdateRunner.php';
+		$status = array('nws' => array(),'gws' => array());
+		$checker = new UpdateCheck();
+		$queue = $checker->getUpdateQueue();
+		
+		foreach($queue['nws'] as $module => $info) {
+			$status['nws'][$module] = UpdateRunner::serviceNetwork($module, $info);
+		}
+
+		foreach($queue['gws'] as $module => $info) {
+			UpdateRunner::serviceNetwork($module, $info);
+			$status['gws'][$module] = UpdateRunner::serviceNetwork($module, $info);
+		}
+		$checker->check(true);
+		return json_encode($status);
 	}
 	
 	private function registerPost() {

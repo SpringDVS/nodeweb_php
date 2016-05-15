@@ -10,4 +10,5 @@ return array(
 	'description' => 'Post events, meetings and notices to the network',
 	'module' => 'bulletin',
 	'encoding' => 'json',
+	'version' => '1.0',
 );

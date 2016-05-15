@@ -9,6 +9,7 @@ include 'system/controllers/ManagementApiController.php';
 include 'system/controllers/SpringApiController.php';
 include 'system/controllers/GatewayApiController.php';
 include 'system/handlers/ProtocolHandler.php';
+include 'system/updater/UpdateCheck.php';
 
 Flight::register('manApi', 'ManagementApiController');
 Flight::register('springApi', 'SpringApiController');
@@ -18,7 +19,8 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	
 	session_start();
 	
-	$user = Flight::user();
+	$updater = new UpdateCheck();
+		
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
 	
@@ -26,6 +28,8 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	if( ($token = filter_input(INPUT_POST, '__token')) !== null) {
 		if($token == \SpringDvs\Config::$sys['api_token'] && $area == 'api') {
 			define('NODE_ADMIN', true); // We are in admin mode
+			$updater->check();
+			
 			$api = Flight::manApi();
 			$json = $api->request($route->params);
 			Flight::render('master_json', array('json' => $json));
@@ -52,7 +56,9 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	
 	define('NODE_ADMIN', true); // We are in admin mode
 	define('NODE_LOCAL', true); // We are working on the local system
-	
+
+	$updater->check();
+
 	switch($area) {
 	case 'api':
 		$api = Flight::manApi();
