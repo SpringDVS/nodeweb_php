@@ -20,6 +20,7 @@ class UpdateRunner {
 		}
 		
 		if(!self::validatePackage($pkgpath, $info)) {
+			unlink($pkgpath);
 			return -1;
 		}
 		self::lock($type, $module);

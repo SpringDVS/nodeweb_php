@@ -24,8 +24,9 @@ class UpdateCheck {
 		if(!$t){ $this->db->set('last_check', time()); }
 		
 		$c = time();
-		
-		if($c - $t < 5400){ return false; }
+		$diff = $c - $t; 
+		if($diff < 5400){ return false; }
+
 		$this->db->set('last_check', $c);
 		return true;
 	}
