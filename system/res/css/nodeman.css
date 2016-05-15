@@ -66,3 +66,19 @@ div.white-container h3 {
     width: 100%;
     border-bottom: 2px solid #D3D5D5;
 }
+div.update-block {
+   margin-bottom: 15px; 
+}
+div.update-type {
+    margin-bottom: 5px;
+    font-weight: strong;
+} 
+div.update-item {
+    font-weight: normal;
+    font-size: 14px;
+    
+}
+
+#updater {
+    display: none;
+}

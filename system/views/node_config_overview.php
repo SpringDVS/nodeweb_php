@@ -28,6 +28,22 @@
 			</tbody>
 		</table>
 	</div>
+	
+	<div class="white-container raised">
+		<h3>Updates</h3>
+		
+		<div id="update-list" data-bind="foreach: updates">
+			<div class="update-block">
+			<div class="update-type" style="font-weight: bold;" data-bind="text:mtype"></div>
+			<div class="update-item" data-bind="foreach: modules">
+				<code style="font-weight: bold;" data-bind="text: module"></code> version  
+				<span data-bind="text: details.version"></span>
+			</div>
+			</div>
+		</div>
+		<button id="updater" onclick="ManOverviewController.performUpdate()">Update</button>
+		<div id="update-msg"></div>
+	</div>
 </div>
 
 <div class="pure-u-2-5">

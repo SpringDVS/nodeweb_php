@@ -49,6 +49,7 @@ class ManagementApiController {
 			'register' => "Unregistered",
 			'nwservices' => [],
 			'gwservices' => [],
+			'updates' => [],
 		) );
 	}
 	
@@ -62,13 +63,20 @@ class ManagementApiController {
 	private function updatesGet() {
 		$checker = new UpdateCheck();
 		$queue = $checker->getUpdateQueue();
-		foreach($queue as &$type) {
-			foreach($type as &$details) {
+		$out = array(
+				array('mtype' => 'Network', 'modules' => array()),
+				array('mtype' => 'Gateway', 'modules' => array())
+			);
+		$index = 0;
+		foreach($queue as $prefix => $type) {
+			foreach($type as $module => $details) {
 				unset($details['sha1']);
+				$out[$index]['modules'][] = array('module' => $module, 'details' => $details);
 			}
+			$index++;
 		}
 		
-		return json_encode($queue);
+		return json_encode($out);
 	}
 	
 	private function updatesPost($service) {

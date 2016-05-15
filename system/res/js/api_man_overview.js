@@ -68,6 +68,7 @@ var ManOverviewController = {
             ko.applyBindings( ManOverviewController.viewModel );
             ManOverviewController.refreshStatus();
             ManOverviewController.requestServices();
+            ManOverviewController.requestUpdates();
         });
         
         
@@ -95,6 +96,29 @@ var ManOverviewController = {
         
         $.getJSON('/node/api/gwservices/pull/', function(data) {
             ManOverviewController.viewModel.gwservices(data);
+        }); 
+    },
+    
+   requestUpdates: function () {
+        
+        $.getJSON('/node/api/updates/pull/', function(data) {
+            ManOverviewController.viewModel.updates(data);
+
+            if(data[0].modules.length > 0 || data[1].modules.length > 0) {
+                $("#updater").show();
+                $("#update-msg").text("");
+                $("#update-list").show();
+            } else {
+                $("#updater").hide();
+                $("#update-list").hide();
+                $("#update-msg").text("Fully up-to-date!");
+            }
+        }); 
+    },
+    
+    performUpdate: function() {
+        $.getJSON('/node/api/updates/push/', function(data) {
+            ManOverviewController.requestUpdates();
         }); 
     }
     
