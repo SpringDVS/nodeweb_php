@@ -13,6 +13,10 @@ class UpdateRunner {
 		return self::run('gws', 'gateway', $module, $info);
 	}
 	
+	public static function coreUpdate($info) {
+		
+	}
+	
 	private static function run($prefix, $type, $module, $info) {
 		$path = \SpringDvs\Config::$sys['store']."/cache";
 		$package = "$prefix.{$module}_{$info['version']}.tgz";
