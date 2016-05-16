@@ -1,10 +1,11 @@
 <?php
-use Flintstone\Flintstone;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* Notice:  Copyright 2016, The Care Connections Initiative c.i.c.
+ * Author:  Charlie Fyvie-Gauld <cfg@zunautica.org>
+ * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
+
+use Flintstone\Flintstone;
+
 class UpdateCheck {
 	private $db;
 	public function __construct() {
