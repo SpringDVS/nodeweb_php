@@ -18,8 +18,9 @@ class RequestHandler {
 	
 		$path = "system/modules/network/$res/request.php";
 		$ipath = "system/modules/network/$res/info.php";
+		$lock =  "system/modules/network/$res/update.lock";
 
-		if(!file_exists($path) || !file_exists($ipath)) {
+		if(!file_exists($path) || !file_exists($ipath) || file_exists($lock)) {
 			$frame = new \SpringDvs\FrameResponse(SpringDvs\DvspRcode::malformed_content);
 			return \SpringDvs\DvspPacket::ofType(
 					\SpringDvs\DvspMsgType::gsn_response, $frame->serialise()
