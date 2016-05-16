@@ -13,7 +13,7 @@ $final = [];
 $queries = [];
 
 parse_str($url->query(), $queries);
-
+$bulletins = array_reverse($bulletins);
 if(isset($queries['tags'])) {
 
 	$qtags = explode(',', $queries['tags']);
@@ -33,6 +33,10 @@ if(isset($queries['tags'])) {
 		$value['tags'] = $tags;
 	}
 	$final = $bulletins;
+}
+
+if(isset($queries['limit']) && intval($queries['limit'])) {
+	$final = array_slice($final, 0, $queries['limit']);
 }
 
 return array_values($final);
