@@ -8,16 +8,19 @@ use Flintstone\Flintstone;
 
 class UpdateCheck {
 	private $db;
-	public function __construct() {
+	private $src;
+	public function __construct($versionSrc = 'http://spring.care-connections.org/versions') {
 		$options['dir'] = SpringDvs\Config::$sys['store_live'];
 		$this->db = new Flintstone('system', $options);
+		$this->src = $versSrc;
 	}
+
 	public function check($force = false) {
 		if(!$force && !$this->timeout()){
 			return;
 		}
 
-		$this->versions();
+		$this->cmpVersions();
 	}
 	
 	private function timeout() {
@@ -32,7 +35,7 @@ class UpdateCheck {
 		return true;
 	}
 	
-	private function versions() {
+	private function cmpVersions() {
 		include_once __DIR__.'/SemanticVersion.php';
 		
 		
@@ -40,24 +43,27 @@ class UpdateCheck {
 			$services = array();
 		
 			foreach($this->extractServices("system/modules/$type/") as $info) {
-				$json = "";
-				try {
-					$json = file_get_contents("http://spring.care-connections.org/versions/{$prefix}.{$info['module']}.json");
-				} catch(Exception $e) { continue; }
-				
-				if(!$json){ continue; }
-
-				$response = json_decode($json, true);
+				$response = $this->getVersionInfo("{$prefix}.{$info['module']}");
+				if(!$response){ continue; }
 				
 				if(!$this->needsUpdate($info['version'], $response['version'])) {
 					continue;
 				}
 				$services[$info['module']] = $response;
-
 			}
 			$this->db->delete($prefix);
 			$this->db->set($prefix, $services);	
 		}
+		
+		
+		
+	}
+	
+	private function getVersionInfo($pkg) {
+		$json = "";
+		try {
+			return json_decode(file_get_contents("$this->src/{$pkg}.json"));
+		} catch(Exception $e) { return null; }
 		
 	}
 	
