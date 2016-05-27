@@ -20,7 +20,6 @@ class ModuleHandler implements IModuleHandler {
 		$root = "system/modules/$type/$res";
 		$path = "$root/request.php";
 		$ipath = "$root/info.php";
-		$lock =  "$root/update.lock";
 	}
 	
 	public function install($type, $module, $archive) {
