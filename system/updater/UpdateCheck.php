@@ -3,26 +3,31 @@
  * Author:  Charlie Fyvie-Gauld <cfg@zunautica.org>
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
-
+define('CHK_UPDATE_MODULES', 1);
+define('CHK_UPDATE_CORE', 2);
 class UpdateCheck {
 	private $db;
 	private $mh;
+	private $ch;
 	private $vh;
 	
 	public function __construct(IVersionHandler $versionHandler,
 								IModuleHandler $moduleHandler,
+								ICoreHandler $coreHandler,
 								ISystemUpdateDb $updateStore) {
 		$this->vh = $versionHandler;
 		$this->mh = $moduleHandler;
+		$this->ch = $coreHandler;
 		$this->db = $updateStore;
 	}
 
-	public function checkModules($force = false) {
+	public function check($type, $force = false) {
 		if(!$force && !$this->timeout()){
 			return;
 		}
 
-		$this->sortModuleUpdates();
+		if($type & CHK_UPDATE_CORE) $this->sortCoreUpdate();
+		if($type & CHK_UPDATE_MODULES) $this->sortModuleUpdates();
 	}
 	
 	private function timeout() {
@@ -62,6 +67,17 @@ class UpdateCheck {
 		
 		
 		
+	}
+	
+	private function sortCoreUpdate() {
+		$info = $this->ch->getInfo();
+		$response = $this->vh->info("php.web.core");
+		if(!$response) return;
+		
+		if(!$this->vh->needsUpdate($info['version'], $response['version'])) return;
+		
+		$this->db->delete('core');
+		$this->db->add('core', array('php.web.core' => $response));
 	}
 	
 	public function getUpdateQueue() {

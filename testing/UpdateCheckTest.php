@@ -1,13 +1,14 @@
 <?php
 include '../autoload.php';
 
-class UpdateCheckTest extends PHPUnit_Framework_TestCase {
+class UpdateCheckModuleTest extends PHPUnit_Framework_TestCase {
 	private $mhmock;
 	private $vhmock;
+	private $chmock;
 	private $sdmock;
 
 	public function setUp() {
-		
+		$this->chmock = $this->getMockBuilder('ICoreHandler')->getMock();
 		$this->mhmock = $this->getMockBuilder('IModuleHandler')->getMock();
 		$this->vhmock = $this->getMockBuilder('IVersionHandler')->getMock();
 		$this->sdmock = $this->getMockBuilder('ISystemUpdateDb')->getMock();
@@ -25,6 +26,8 @@ class UpdateCheckTest extends PHPUnit_Framework_TestCase {
 				);		
 	}
 
+// --- MODULE UPDATE ---
+
 	public function testUpdateModuleBehaviorNoTimeout() {
 		$this->sdmock->method('lastTimestamp')
 						->willReturn(time());
@@ -32,18 +35,18 @@ class UpdateCheckTest extends PHPUnit_Framework_TestCase {
 		$this->mhmock->expects($this->never())
 						->method('getListInfo');
 
-		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->sdmock);
-		$check->checkModules();
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
+		$check->check(CHK_UPDATE_MODULES);
 	}
 	
 	public function testUpdateModuleBehaviorNoModules() {
 		$this->mhmock->method('getInfoList')
 						->willReturn(array());
 	
-		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->sdmock);
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
 
 		// Force it
-		$check->checkModules(true);
+		$check->check(CHK_UPDATE_MODULES, true);
 	}
 	
 	public function testUpdateModuleBehaviorNoModulesAtTimeout() {
@@ -58,10 +61,10 @@ class UpdateCheckTest extends PHPUnit_Framework_TestCase {
 						->willReturn(array());
 
 	
-		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->sdmock);
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
 	
 
-		$check->checkModules();
+		$check->check(CHK_UPDATE_MODULES);
 	}
 	
 	public function testUpdateModuleBehaviorNoUpdate() {
@@ -80,10 +83,10 @@ class UpdateCheckTest extends PHPUnit_Framework_TestCase {
 		$this->vhmock->expects($this->once())->method('needsUpdate')->willReturn(false);
 	
 	
-		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->sdmock);
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
 	
 	
-		$check->checkModules(true);
+		$check->check(CHK_UPDATE_MODULES, true);
 	}
 	
 	public function testUpdateModuleBehaviourOneUpdate() {
@@ -109,9 +112,9 @@ class UpdateCheckTest extends PHPUnit_Framework_TestCase {
 						->method('add')
 						->with( $this->equalTo('nws'), $this->equalTo(array('testpkg' => $mockVersion )) );
 		
-		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->sdmock);
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
 			
-		$check->checkModules(true);
+		$check->check(CHK_UPDATE_MODULES, true);
 	}
 	
 	public function testUpdateModuleBehaviourMultiModuleOneUpdate() {
@@ -145,8 +148,8 @@ class UpdateCheckTest extends PHPUnit_Framework_TestCase {
 								$this->equalTo(array('testpkg2' => $mockVersion )) 
 							);
 	
-		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->sdmock);
-		$check->checkModules(true);
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
+		$check->check(CHK_UPDATE_MODULES, true);
 	}
 	
 	public function testUpdateModuleBehaviourMultiModuleMultiUpdate() {
@@ -180,7 +183,77 @@ class UpdateCheckTest extends PHPUnit_Framework_TestCase {
 				$this->equalTo(array('testpkg' => $mockVersion, 'testpkg3' => $mockVersion ))
 				);
 	
-		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->sdmock);
-		$check->checkModules(true);
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
+		$check->check(CHK_UPDATE_MODULES, true);
 	}
-}
+	
+// --- CORE UPDATE ---
+
+	public function testUpdateCoreBehaviorNoTimeout() {
+		$this->sdmock->method('lastTimestamp')
+		->willReturn(time());
+	
+		$this->mhmock->expects($this->never())
+		->method('getListInfo');
+	
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
+		$check->check(CHK_UPDATE_CORE, true);
+	}
+	
+	public function testUpdateCoreBehaviorNoUpdate() {
+	
+		$this->mhmock->method('getInfo')
+		->willReturn(array('module' => 'testpkg','version' => '0.5.0'));
+	
+		$this->vhmock->expects($this->once())->method('info')->willReturn(array('version' => '0.5.0'));
+		$this->vhmock->expects($this->once())->method('needsUpdate')->willReturn(false);
+	
+		$this->sdmock->expects($this->never())->method('delete');
+		$this->sdmock->expects($this->never())->method('add');
+	
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
+	
+	
+		$check->check(CHK_UPDATE_CORE, true);
+	}
+
+	public function testUpdateCoreBehaviourUpdate() {
+		$this->mhmock->method('getInfo')
+		->willReturn(array('module' => 'php.web.core','version' => '0.4.0'));
+		
+		$this->vhmock->expects($this->once())->method('info')->willReturn(array('version' => '0.5.0'));
+		$this->vhmock->expects($this->once())->method('needsUpdate')->willReturn(true);
+		
+		$this->sdmock->expects($this->once())->method('delete');
+		$this->sdmock->expects($this->once())->method('add')->with(
+																$this->equalTo('core'),
+																$this->equalTo(array('php.web.core' => 
+																					array('version' => '0.5.0')
+																					
+																					)
+																				)
+																			);
+		
+		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
+		
+		
+		$check->check(CHK_UPDATE_CORE, true);		
+	}
+}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
