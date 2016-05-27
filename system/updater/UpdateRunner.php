@@ -5,40 +5,42 @@
  */
 
 class UpdateRunner {
-	public static function serviceNetwork($module, $info) {
-		return self::run('nws', 'network', $module, $info);
+	private $db;
+	private $ph;
+	
+	public function __construct(ISytemUpdateDb $db,
+								IPackageHandler $pkgHandler
+	) {
+		$this->db = $db;
+		$this->ph = $pkgHandler;
+	}
+	public function serviceNetwork($module, $info) {
+		return $this->run('nws', 'network', $module, $info);
 	}
 	
-	public static function serviceGateway($module, $info) {
-		return self::run('gws', 'gateway', $module, $info);
+	public function serviceGateway($module, $info) {
+		return $this->run('gws', 'gateway', $module, $info);
 	}
 	
-	public static function coreUpdate($info) {
+	public static function core($info) {
 		
 	}
 	
-	private static function run($prefix, $type, $module, $info) {
-		$path = \SpringDvs\Config::$sys['store']."/cache";
-		$package = "$prefix.{$module}_{$info['version']}.tgz";
-		$pkgpath = "$path/$package";
-		if(!file_exists($pkgpath)) {
-			if(file_put_contents($pkgpath, fopen("http://packages.spring-dvs.org/{$package}", 'r')) === false) {
-				return -2;
-			}
-		}
-		
-		if(!self::validatePackage($pkgpath, $info)) {
+	private function run($prefix, $type, $module, $info) {
+
+		$package = "$prefix.{$module}_{$info['version']}.tgz";		
+		$pkgpath = $this->ph->pull($package);
+		if(!$this->ph->validatePackage($pkgpath, $info['sha1'])) {
 			unlink($pkgpath);
 			return -1;
-		}
+		}	
+		
 		self::lock($type, $module);
 		$arch = "$path/$prefix.{$module}_{$info['version']}.tar";
-		$p = new PharData($pkgpath);
-		$p->decompress("{$module}_{$info['version']}.tar");
-		$phar = new PharData($arch);
-		$extractionPath = "system/modules/$type/";
-		$phar->extractTo($extractionPath, null, true);
+		
+		$ph->unpack($arch, "system/modules/$type/");
 		self::unlock($type, $module);
+		
 		unlink($pkgpath);
 		unlink($arch);
 		return 0;		
@@ -49,11 +51,5 @@ class UpdateRunner {
 	}
 	private static function unlock($type, $module) {
 		unlink("system/modules/$type/$module/update.lock");
-	}
-	
-	private static function validatePackage($filename, $info) {
-		$digest = sha1_file($filename);
-		if($digest != $info['sha1']) return false;
-		return true;
 	}
 }
