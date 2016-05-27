@@ -34,8 +34,7 @@ echo "
 spl_autoload_register(function (\$class) { 
 	global \$Gcm__;
 	if(!isset(\$Gcm__[\$class])) return; 
-	include __DIR__.'/system/' . \$Gcm__[\$class];	
-	unset(\$Gcm__[\$class]);
+	include __DIR__.'/system/' . \$Gcm__[\$class];
 });\n";
 
 fwrite($fp, ob_get_clean());

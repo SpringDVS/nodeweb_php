@@ -16,13 +16,12 @@ $Gcm__ = array(
 	'IVersionHandler'=>'interfaces/IVersionHandler.php',
 	'NetspaceKvs'=>'models/NetspaceKvs.php',
 	'Resolution'=>'models/Resolution.php',
-	'SystemUpdateDb'=>'models/SystemUpdateDb.php',
+	'SystemUpdateKvs'=>'models/SystemUpdateKvs.php',
 	'UpdateCheck'=>'updater/UpdateCheck.php',
 	'UpdateRunner'=>'updater/UpdateRunner.php',
 );
 spl_autoload_register(function ($class) { 
 	global $Gcm__;
 	if(!isset($Gcm__[$class])) return; 
-	include __DIR__.'/system/' . $Gcm__[$class];	
-	unset($Gcm__[$class]);
+	include __DIR__.'/system/' . $Gcm__[$class];
 });

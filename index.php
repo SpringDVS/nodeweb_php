@@ -11,6 +11,7 @@ ini_set("allow_url_include", true);
 error_reporting(E_ALL);
 
 require 'vendor/autoload.php';
+require 'autoload.php';
 
 
 Flight::set('flight.views.path', 'system/views');
