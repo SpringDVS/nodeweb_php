@@ -2,7 +2,7 @@
 
 
 ?>
-<div class="pure-u-1-5">&nbsp</div>
+<div class="pure-u-1-5">&nbsp;</div>
 <div class="pure-u-3-5">
 	
 	<div class="white-container raised">

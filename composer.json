@@ -2,14 +2,14 @@
     "repositories": [
         {
             "type": "path",
-            "url": "/home/cfg/Development/www/SpringLibs/NetLib/",
+            "url": "/home/cfg/Workspace/php.net.lib/",
             "options": {
                 "symlink": true
             }
         },
         {
             "type": "path",
-            "url": "/home/cfg/Development/www/SpringLibs/NodeLib/",
+            "url": "/home/cfg/Workspace/php.node.lib/",
             "options": {
                 "symlink": true
             }

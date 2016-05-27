@@ -12,7 +12,7 @@ class UpdateCheck {
 	public function __construct($versionSrc = 'http://spring.care-connections.org/versions') {
 		$options['dir'] = SpringDvs\Config::$sys['store_live'];
 		$this->db = new Flintstone('system', $options);
-		$this->src = $versSrc;
+		$this->src = $versionSrc;
 	}
 
 	public function check($force = false) {

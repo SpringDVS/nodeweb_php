@@ -17,4 +17,5 @@ Flight::set('flight.views.path', 'system/views');
 include 'system/routes.php';
 include 'system/config.php';
 
+
 Flight::start();

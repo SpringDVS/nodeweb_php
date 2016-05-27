@@ -284,7 +284,7 @@
 						</div>
 					</aside>
 					
-					<div class="pure-1-1" style="clear: both;">&nbsp</div>
+					<div class="pure-1-1" style="clear: both;">&nbsp;</div>
 
 					<section class="pure-u-1-4">
 						
@@ -302,7 +302,7 @@
 						</div>
 					</aside>
 					
-					<div class="pure-1-1" style="clear: both;">&nbsp</div>
+					<div class="pure-1-1" style="clear: both;">&nbsp;</div>
 					
 					<section class="pure-u-1-4">
 						
@@ -320,7 +320,7 @@
 						</div>
 					</aside>
 					
-					<div class="pure-1-1" style="clear: both;">&nbsp</div>
+					<div class="pure-1-1" style="clear: both;">&nbsp;</div>
 					<legend class="pure-u-1-1"><strong>URI</strong></legend>
 					<section class="pure-u-1-1">
 						
@@ -331,7 +331,7 @@
 						
 					</section>
 					
-					<div class="pure-1-1" style="clear: both;">&nbsp</div>
+					<div class="pure-1-1" style="clear: both;">&nbsp;</div>
 					<legend class="pure-u-1-1"><strong>Database</strong></legend>
 					<section class="pure-u-1-4">
 						

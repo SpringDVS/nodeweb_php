@@ -14,7 +14,7 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 		<table class="pure-table pure-table-horizontal" style="margin-top: 10px;">
 			<tr>
 				<td><strong>Name:</strong></td>
-				<td data-bind="text: name">Unknown</span></td>
+				<td data-bind="text: name"></td>
 			</tr>
 			
 			<tr>
@@ -24,7 +24,7 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 
 			<tr>
 				<td><strong>tags:</strong></td>
-				<td data-bind="text: tags">Unknown</span></td>
+				<td data-bind="text: tags">Unknown</td>
 			</tr>
 		</table>
 		
