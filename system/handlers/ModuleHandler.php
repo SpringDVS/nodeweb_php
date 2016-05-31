@@ -3,7 +3,8 @@
 class ModuleHandler implements IModuleHandler {
 	
 	public function getInfoList($type) {
-		$dirs = array_filter(glob($type.'/*'), 'is_dir');
+		$dirs = array_filter(glob(__DIR__.'/../modules/'.$type.'/*'), 'is_dir');
+
 		$result = [];
 		foreach($dirs as $d) {
 			$path = $d.'/info.php';
@@ -13,6 +14,7 @@ class ModuleHandler implements IModuleHandler {
 			if(!is_array($r)) continue;
 			$result[] = $r;
 		}
+
 		return $result;
 	}
 	

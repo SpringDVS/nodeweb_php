@@ -5,11 +5,6 @@
  */
 
 include 'User.php';
-include 'system/controllers/ManagementApiController.php';
-include 'system/controllers/SpringApiController.php';
-include 'system/controllers/GatewayApiController.php';
-include 'system/handlers/ProtocolHandler.php';
-include 'system/updater/UpdateCheck.php';
 
 Flight::register('manApi', 'ManagementApiController');
 Flight::register('springApi', 'SpringApiController');
@@ -19,7 +14,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	
 	session_start();
 	
-	$updater = new UpdateCheck();
+	$updater = new UpdateCheck(new VersionHandler(), new ModuleHandler(), new CoreHandler(), new SystemUpdateKvs());
 		
 	$scriptsTop =  array();
 	$scriptsBottom =  array();
@@ -57,7 +52,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	define('NODE_ADMIN', true); // We are in admin mode
 	define('NODE_LOCAL', true); // We are working on the local system
 
-	$updater->check();
+	$updater->check(CHK_UPDATE_MODULES|CHK_UPDATE_CORE);
 
 	switch($area) {
 	case 'api':

@@ -47,7 +47,7 @@ class UpdateRunner {
 		}
 
 		$this->lock($type, $module);
-		$this->ph->unpack($path, "system/modules/$type/");
+		$this->ph->unpack($path, "system/modules/$type");
 		$this->unlock($type, $module);
 		return self::OK;		
 	}

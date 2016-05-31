@@ -4,7 +4,7 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
-class CoreHandler extends ICoreHandler {
+class CoreHandler implements ICoreHandler {
 	public function getInfo() {
 		if(!file_exists(__DIR__.'/../coreinfo.hp')) return;
 		

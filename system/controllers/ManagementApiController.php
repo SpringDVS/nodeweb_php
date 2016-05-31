@@ -61,11 +61,12 @@ class ManagementApiController {
 	}
 	
 	private function updatesGet() {
-		$checker = new UpdateCheck();
+		$checker = new UpdateCheck(new VersionHandler(), new ModuleHandler(), new CoreHandler(), new SystemUpdateKvs());
 		$queue = $checker->getUpdateQueue();
 		$out = array(
 				array('mtype' => 'Network', 'modules' => array()),
-				array('mtype' => 'Gateway', 'modules' => array())
+				array('mtype' => 'Gateway', 'modules' => array()),
+				array('mtype' => 'Core', 'modules' => array())
 			);
 		$index = 0;
 		foreach($queue as $prefix => $type) {
@@ -80,20 +81,19 @@ class ManagementApiController {
 	}
 	
 	private function updatesPost($service) {
-		include 'system/updater/UpdateRunner.php';
 		$status = array('nws' => array(),'gws' => array());
-		$checker = new UpdateCheck();
+		$checker = new UpdateCheck(new VersionHandler(), new ModuleHandler(), new CoreHandler(), new SystemUpdateKvs());
+		$runner = new UpdateRunner(new PackageHandler());
 		$queue = $checker->getUpdateQueue();
 		
 		foreach($queue['nws'] as $module => $info) {
-			$status['nws'][$module] = UpdateRunner::serviceNetwork($module, $info);
+			$status['nws'][$module] = $runner->serviceNetwork($module, $info);
 		}
 
 		foreach($queue['gws'] as $module => $info) {
-			UpdateRunner::serviceNetwork($module, $info);
-			$status['gws'][$module] = UpdateRunner::serviceNetwork($module, $info);
+			$status['gws'][$module] = $runner->serviceGateway($module, $info);
 		}
-		$checker->check(true);
+		$checker->check(CHK_UPDATE_MODULES, true);
 		return json_encode($status);
 	}
 	

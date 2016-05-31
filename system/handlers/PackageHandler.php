@@ -15,7 +15,7 @@ class PackageHandler implements IPackageHandler {
 		$path = \SpringDvs\Config::$sys['store']."/cache";
 		$pkgpath = "$path/$pkg";
 		if(!file_exists($pkgpath)) {
-			if(file_put_contents($pkgpath, fopen("{$this->repo}/{$package}", 'r')) === false) {
+			if(file_put_contents($pkgpath, fopen("{$this->repo}/{$pkg}", 'r')) === false) {
 				return null;
 			}
 		}
@@ -31,10 +31,27 @@ class PackageHandler implements IPackageHandler {
 	
 	public function unpack($archive, $dest) {
 		$p = new PharData($archive);
-		$p->decompress(dirname($archive).'/unpacked.tar');
-		$phar = new PharData($arch);
-		$phar->extractTo($dest, null, true);
-		unlink($path.'/unpacked.tar');
+		$path = dirname($archive);
+		$tname = $fname = explode('.', basename($archive));
+		unset($fname[0]);
+		unset($fname[count($fname)]);
+		unset($tname[count($tname)-1]);
+		
+		$tar = implode('.',$fname).".tar";
+		$utar = implode('.', $tname);
+		
+		
+		try{
+			$dephar = $p->decompress($tar);
+			$phar = new PharData("$path/$utar.tar");
+			$dephar->extractTo($dest, null, true);
+			unlink("$path/$utar.tar");
+		} catch (Exception $e) {
+			
+			echo $e;
+			return;
+		}
+		
 		unlink($archive);
 	}
 	
