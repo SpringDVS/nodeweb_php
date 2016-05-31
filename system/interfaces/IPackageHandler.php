@@ -4,5 +4,6 @@
 interface IPackageHandler {
 	public function pull($pkg);
 	public function validate($archive, $checksum);
-	public function unpack($path, $archive, $dest);
+	public function unlink($archive);
+	public function unpack($archive, $dest);
 }

@@ -33,4 +33,8 @@ class PackageHandler implements IPackageHandler {
 		unlink($path.'/unpacked.tar');
 		unlink($archive);
 	}
+	
+	public function unlink($archive) {
+		unlink($archive);
+	}
 }

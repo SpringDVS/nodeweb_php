@@ -4,14 +4,16 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
+
+
 class UpdateRunner {
-	private $db;
 	private $ph;
+	const FAIL_DOWNLOAD = -2;
+	const FAIL_CHECKSUM = -1;
+	const OK = 0;
 	
-	public function __construct(ISytemUpdateDb $db,
-								IPackageHandler $pkgHandler
-	) {
-		$this->db = $db;
+	
+	public function __construct(IPackageHandler $pkgHandler) {
 		$this->ph = $pkgHandler;
 	}
 	public function serviceNetwork($module, $info) {
@@ -29,27 +31,26 @@ class UpdateRunner {
 	private function run($prefix, $type, $module, $info) {
 
 		$package = "$prefix.{$module}_{$info['version']}.tgz";		
+
 		$pkgpath = $this->ph->pull($package);
-		if(!$this->ph->validatePackage($pkgpath, $info['sha1'])) {
-			unlink($pkgpath);
-			return -1;
+		
+		if($pkgpath == null) return self::FAIL_DOWNLOAD;
+		
+		if(!$this->ph->validate($pkgpath, $info['sha1'])) {
+			$this->ph->unlink($pkgpath);
+			return self::FAIL_CHECKSUM;
 		}	
 		
-		self::lock($type, $module);
-		$arch = "$path/$prefix.{$module}_{$info['version']}.tar";
-		
-		$ph->unpack($arch, "system/modules/$type/");
-		self::unlock($type, $module);
-		
-		unlink($pkgpath);
-		unlink($arch);
-		return 0;		
+		$this->lock($type, $module);
+		$this->ph->unpack($pkgpath, "system/modules/$type/");
+		$this->unlock($type, $module);
+		return self::OK;		
 	}
 	
-	private static function lock($type, $module) {
+	private function lock($type, $module) {
 		fopen("system/modules/$type/$module/update.lock", 'w');
 	}
-	private static function unlock($type, $module) {
+	private function unlock($type, $module) {
 		unlink("system/modules/$type/$module/update.lock");
 	}
 }
