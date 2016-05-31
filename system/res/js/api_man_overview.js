@@ -104,7 +104,7 @@ var ManOverviewController = {
         $.getJSON('/node/api/updates/pull/', function(data) {
             ManOverviewController.viewModel.updates(data);
 
-            if(data[0].modules.length > 0 || data[1].modules.length > 0) {
+            if(data[0].modules.length > 0 || data[1].modules.length > 0 || data[2].modules.length > 0) {
                 $("#updater").show();
                 $("#update-msg").text("");
                 $("#update-list").show();

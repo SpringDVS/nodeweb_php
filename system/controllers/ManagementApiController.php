@@ -81,11 +81,15 @@ class ManagementApiController {
 	}
 	
 	private function updatesPost($service) {
-		$status = array('nws' => array(),'gws' => array());
+		$status = array('nws' => array(),'gws' => array(),'core' => array());
 		$checker = new UpdateCheck(new VersionHandler(), new ModuleHandler(), new CoreHandler(), new SystemUpdateKvs());
 		$runner = new UpdateRunner(new PackageHandler());
 		$queue = $checker->getUpdateQueue();
-		
+
+		foreach($queue['core'] as $module => $info) {
+			$status['core'][$module] = $runner->serviceNetwork($info);
+		}
+
 		foreach($queue['nws'] as $module => $info) {
 			$status['nws'][$module] = $runner->serviceNetwork($module, $info);
 		}
@@ -93,7 +97,8 @@ class ManagementApiController {
 		foreach($queue['gws'] as $module => $info) {
 			$status['gws'][$module] = $runner->serviceGateway($module, $info);
 		}
-		$checker->check(CHK_UPDATE_MODULES, true);
+
+		$checker->check(CHK_UPDATE_MODULES|CHK_UPDATE_CORE, true);
 		return json_encode($status);
 	}
 	

@@ -92,7 +92,11 @@ class UpdateCheck {
 		} else {
 			$queue['gws'] = array();
 		}
-		
+		if( ($q = $this->db->services('core')) ) {
+			$queue['core'] = $q;
+		} else {
+			$queue['core'] = array();
+		}		
 		return $queue;
 	}
 }
