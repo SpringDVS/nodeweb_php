@@ -3,7 +3,7 @@ include '../vendor/autoload.php';
 /**
  * Description of DvspUrlTest
  */
-class DvspUrlTest extends PHPUnit_Framework_TestCase {
+class UrlTest extends PHPUnit_Framework_TestCase {
 	public function testUrlRoute() {
 		$url = new \SpringDvs\Url("spring://a.b.c.uk");
 		$this->assertEquals(4, count($url->route()));

@@ -1,7 +1,7 @@
 <?php
 include '../vendor/autoload.php';
 
-class DvspNodeTest extends PHPUnit_Framework_TestCase {
+class NodeTest extends PHPUnit_Framework_TestCase {
 	public function testFromNodeString() {
 		$node = SpringDvs\Node::from_nodestring("spring,host,127.0.1.2");
 		

@@ -1,12 +1,13 @@
 <?php
 include '../vendor/autoload.php';
+include '../system/config.php';
 include '../system/models/NetspaceKvs.php';
 \SpringDvs\Config::$spec['testing'] = true;
 
-class DvspNetspaceKvsTest extends PHPUnit_Framework_TestCase {
+class NetspaceKvsTest extends PHPUnit_Framework_TestCase {
 	private function netspace() {
 		
-		$db = new NetspaceKvs(true, '../system/store/testunit/');
+		$db = new NetspaceKvs(true, null);
 		$this->reset($db->dbGsn());
 		$this->reset($db->dbGtn());
 		return $db;
