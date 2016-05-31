@@ -33,6 +33,7 @@ class UpdateRunner {
 		}
 		
 		$this->ph->unpack($path, './');
+		return self::OK;
 	}
 	
 	private function run($prefix, $type, $module, $info) {

@@ -11,6 +11,4 @@ class CoreHandler extends ICoreHandler {
 		return include __DIR__.'/../coreinfo.hp';
 	}
 
-	public function upgrade($archive) {
-	}
 }
