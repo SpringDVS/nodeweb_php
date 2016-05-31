@@ -87,7 +87,7 @@ class ManagementApiController {
 		$queue = $checker->getUpdateQueue();
 
 		foreach($queue['core'] as $module => $info) {
-			$status['core'][$module] = $runner->serviceNetwork($info);
+			$status['core'][$module] = $runner->core($info);
 		}
 
 		foreach($queue['nws'] as $module => $info) {
