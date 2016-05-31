@@ -6,9 +6,9 @@
 
 class CoreHandler implements ICoreHandler {
 	public function getInfo() {
-		if(!file_exists(__DIR__.'/../coreinfo.hp')) return;
+		if(!file_exists(__DIR__.'/../coreinfo.php')) return;
 		
-		return include __DIR__.'/../coreinfo.hp';
+		return include __DIR__.'/../coreinfo.php';
 	}
 
 }

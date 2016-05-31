@@ -70,6 +70,7 @@ class UpdateCheck {
 	}
 	
 	private function sortCoreUpdate() {
+		$this->db->delete('core');
 		$info = $this->ch->getInfo();
 		$response = $this->vh->info("php.web.core");
 		if(!$response) return;
