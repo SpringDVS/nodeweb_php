@@ -24,25 +24,29 @@ class UpdateRunner {
 		return $this->run('gws', 'gateway', $module, $info);
 	}
 	
-	public static function core($info) {
+	public function core($info) {
+		$package  = "php.web.core_{$info['version']}.tgz";
+		$path = $this->pull($package, $info['sha1']);
 		
+		if($path == self::FAIL_DOWNLOAD || $path == self::FAIL_CHECKSUM) {
+			return $path;
+		}
+		
+		$this->ph->unpack($path, './');
 	}
 	
 	private function run($prefix, $type, $module, $info) {
 
 		$package = "$prefix.{$module}_{$info['version']}.tgz";		
 
-		$pkgpath = $this->ph->pull($package);
-		
-		if($pkgpath == null) return self::FAIL_DOWNLOAD;
-		
-		if(!$this->ph->validate($pkgpath, $info['sha1'])) {
-			$this->ph->unlink($pkgpath);
-			return self::FAIL_CHECKSUM;
-		}	
-		
+
+		$path = $this->pull($package, $info['sha1']);
+		if($path == self::FAIL_DOWNLOAD || $path == self::FAIL_CHECKSUM) {
+			return $path;
+		}
+
 		$this->lock($type, $module);
-		$this->ph->unpack($pkgpath, "system/modules/$type/");
+		$this->ph->unpack($path, "system/modules/$type/");
 		$this->unlock($type, $module);
 		return self::OK;		
 	}
@@ -52,5 +56,17 @@ class UpdateRunner {
 	}
 	private function unlock($type, $module) {
 		unlink("system/modules/$type/$module/update.lock");
+	}
+	
+	private function pull($package, $checksum) {
+		$path = $this->ph->pull($package);
+		if($path == null) return self::FAIL_DOWNLOAD;
+		
+		if(!$this->ph->validate($path, $checksum)) {
+			$this->ph->unlink($path);
+			return self::FAIL_CHECKSUM;
+		}
+		
+		return $path;
 	}
 }
