@@ -23,7 +23,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	if( ($token = filter_input(INPUT_POST, '__token')) !== null) {
 		if($token == \SpringDvs\Config::$sys['api_token'] && $area == 'api') {
 			define('NODE_ADMIN', true); // We are in admin mode
-			$updater->check();
+			$updater->check(CHK_UPDATE_MODULES|CHK_UPDATE_CORE);
 			
 			$api = Flight::manApi();
 			$json = $api->request($route->params);
