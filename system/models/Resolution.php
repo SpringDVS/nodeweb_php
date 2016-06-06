@@ -1,15 +1,25 @@
 <?php
+use SpringDvs;
+use SpringDvs\DvspPacket;
+
 /* Notice:  Copyright 2016, The Care Connections Initiative c.i.c.
  * Author:  Charlie Fyvie-Gauld <cfg@zunautica.org>
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
 /**
- * Provides a means of resolving Spring URI
+ * Provides a means of resolving Spring URI to an IP address
  * 
- * 
+ * This implements the Name Resolution section of the DVSP networking specification 
  */
 class Resolution {
+	
+	/**
+	 * Resolve the provided URL into an IP Address
+	 * @param string $urlstr The URI to resolve
+	 * @param NetspaceKvs $nio The netspace database to check against
+	 * @return \SpringDvs\DvspPacket response; otherwise false
+	 */
 	public static function resolveUrl($urlstr, NetspaceKvs &$nio) {
 		
 		$url = new \SpringDvs\Url($urlstr);

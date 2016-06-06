@@ -6,7 +6,6 @@
 
 /**
  * Provides an interface for handling the data surrounding updates
- *
  */
 interface ISystemUpdateDb {
 	
