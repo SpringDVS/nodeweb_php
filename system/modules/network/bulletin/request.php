@@ -12,6 +12,8 @@ $bulletins = $db->getAll();
 $final = [];
 $queries = [];
 
+
+
 parse_str($url->query(), $queries);
 $bulletins = array_reverse($bulletins);
 if(isset($queries['tags'])) {

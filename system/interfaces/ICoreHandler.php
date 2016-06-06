@@ -4,6 +4,13 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
+/**
+ * Interface for core handler object
+ */
 interface ICoreHandler {
+	/**
+	 * Get current version informatin about the core
+	 * @return version array
+	 */
 	public function getInfo();
 }

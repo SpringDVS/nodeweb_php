@@ -24,9 +24,12 @@ class ServiceController {
 	}
 	
 	private function newPost() {
+		$title = filter_input(INPUT_POST, 'title');
+		$uid = sha1($title+time());
 		$input = [
-			'title' => filter_input(INPUT_POST, 'title'),
-			'type' => filter_input(INPUT_POST, 'type'),
+			'title' => $title,
+			'content' => filter_input(INPUT_POST, 'content'),
+			'uid' => $uid,
 			'tags' => filter_input(INPUT_POST, 'tags')
 		];
 

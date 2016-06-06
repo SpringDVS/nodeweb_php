@@ -4,6 +4,11 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
+/**
+ * Provides a means of resolving Spring URI
+ * 
+ * 
+ */
 class Resolution {
 	public static function resolveUrl($urlstr, NetspaceKvs &$nio) {
 		

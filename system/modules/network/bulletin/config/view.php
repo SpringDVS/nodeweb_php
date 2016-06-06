@@ -10,20 +10,26 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 	<div class="white-container raised">
 		<h3>Bulletin Service</h3>
 		These bulletins are broadcast to the public network
-		<table style="width: 100%; margin-top:10px;" class="pure-table pure-table-bordered pure-table-horizontal">
+		<table style="width: 100%; margin-top:10px;" class="pure-table">
 			<tr>
-				<th style="text-align: left; width: 15%;">Type</th>
-				<th style="text-align: left;">Title</th>
-				<th>&nbsp;</th>
+
 			</tr>
 			<tbody data-bind="foreach: bulletins">
 				<tr>
-					<td data-bind="text: type"></td>
-					<td data-bind="text: title"></td>
-					<td style="text-align: right;"><a href="#" data-bind="click: $root.removeBulletin">remove</a></td>
+					<td style="border-bottom: 1px solid #D3D5D5;">
+					<span style="font-weight: bold;" data-bind="text: title"></span>
+					<span style="float: right;"><a href="#" data-bind="click: $root.removeBulletin">remove</a></span>
+					</td>
 				</tr>
 				<tr>
-					<td style="font-size: 12px;" colspan="3" data-bind="text: tags"></td>
+					<td data-bind="text: content" style="background-color: white;"></td>
+				</tr>
+				
+				<tr>
+					<td style="font-size: 12px; border-top: 1px solid #D3D5D5;border-bottom: 1px solid #D3D5D5;">
+						<span data-bind="text: tags"></span>
+						<span style="font-size: 12px; float: right;" colspan="2" data-bind="text: uid"></span>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -37,12 +43,8 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 			<fieldset>
 				<label for="bf-title">Title</label>
 				<input id="bf-title" type="text" style="width:100%;">
-				<label for="bf-type">Type</label>
-				<select id="bf-type">
-					<option value="event">Event</option>
-					<option value="notice">Notice</option>
-					<option value="service">Service</option>
-				</select>
+				<label for="bf-content">Content</label>
+				<textarea id="bf-content" style="width: 100%;"></textarea>
 				<label for="bf-tags">Tags</label>
 				<input id="bf-tags" type="text" style="width:60%;" placeholder="tag1,tag2,tag3">
 				<small>Separate with commas</small>

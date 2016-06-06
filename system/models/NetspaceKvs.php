@@ -5,12 +5,33 @@
  */
 
 use Flintstone\Flintstone;
+use SpringDvs;
+use SpringDvs\Node;
+use SpringDvs\DvspNodeState;
+use SpringDvs;
 
+/**
+ * Provides Key-Value Store implementation of the netspace model
+ * 
+ * The netspace model is the point that handles the state of the netspace.
+ * Currently it has pretty minimal use but will be utilised more when GSN
+ * caching is working, more so when functional-peer-elevation is online.
+ * 
+ * Current implementation uses Flintstone as the store system
+ */
 class NetspaceKvs implements SpringDvs\iNetspace {
 	private $geosubNetspace;
 	private $geotopNetspace;
 	
-	public function __construct($unitTest = false, $testDir = "") {
+	/**
+	 * Constructor initialises Flintstone
+	 * 
+	 * The configuration options for test and live stores are used
+	 * as the paths given to Flinstone
+	 * 
+	 * @param boolean $unitTest true if unit testing;otherwise false if live
+	 */
+	public function __construct($unitTest = false) {
 		$options = array();
 		if( $unitTest ) {
 			$options['dir'] = SpringDvs\Config::$sys['store_test'];
@@ -22,7 +43,12 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		$this->geotopNetspace = new Flintstone('node_geotop', $options);
 	}
 
-
+	/**
+	 * Get node by IP Address
+	 * 
+	 * @param string $address IP Address
+	 * @return SpringDvs\Node on success; otherwise false if not found
+	 */
 	public function gsnNodesByAddress($address) {
 		
 		$addr = is_string($address) ? 
@@ -40,6 +66,11 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return false;		
 	}
 
+	/**
+	 * Get node by hostname
+	 * @param string $hostname 
+	 * @return SpringDvs\Node on success; otherwise false if not found
+	 */
 	public function gsnNodeByHostname($hostname) {
 		foreach($this->geosubNetspace->getKeys() as $s) {
 			$v = $this->geosubNetspace->get($s);
@@ -51,6 +82,12 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return false;
 	}
 
+	/**
+	 * Get node by Springname
+	 * 
+	 * @param string $springname Springname of node
+	 * @return SpringDvs\Node on success; otherwise false if not found
+	 */
 	public function gsnNodeBySpringName($springname) {
 		if( ($n = $this->geosubNetspace->get($springname)) )
 			return $this->constructNode($springname, $n);
@@ -58,6 +95,12 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 			return false;
 	}
 
+	/**
+	 * Get all nodes of type
+	 * 
+	 * @param bitfield $types A bitfield of types to check against
+	 * @return Array of SpringDvs\Node on success; otherwise empty array
+	 */
 	public function gsnNodesByType($types) {
 		$list = array();
 		foreach($this->geosubNetspace->getKeys() as $s) {
@@ -69,7 +112,13 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		
 		return $list;
 	}
-
+	
+	/**
+	 * Get all nodes by state
+	 *
+	 * @param SpringDvs\DvspNodeState $state State to check against
+	 * @return Array of SpringDvs\Node on success; otherwise empty array
+	 */
 	public function gsnNodesByState($state) {
 		$list = array();
 		foreach($this->geosubNetspace->getKeys() as $s) {
@@ -82,6 +131,11 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return $list;
 	}
 
+	/**
+	 * Get all nodes in the local GSN
+	 *
+	 * @return Array of SpringDvs\Node on success; otherwise empty array
+	 */
 	public function gsnNodes() {
 		$list = array();
 		foreach($this->geosubNetspace->getKeys() as $s) {
@@ -92,6 +146,12 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return $list;
 	}
 
+	/**
+	 * Register a new node in the GSN
+	 * 
+	 * @param SpringDvs\Node $node The node to register
+	 * @return true if registered; otherwise false
+	 */
 	public function gsnNodeRegister($node) {
 		if($this->geosubNetspace->get($node->springname()) !== false
 		|| $this->gsnNodeByHostname($node->hostname()) !== false)
@@ -109,6 +169,12 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return true;
 	}
 
+	/**
+	 * Unregister a new node in the GSN
+	 * 
+	 * @param SpringDvs\Node $node The node to unregister
+	 * @return true if unregistered; otherwise false
+	 */
 	public function gsnNodeUnregister($node) {
 		if($this->geosubNetspace->get($node->springname()) === false 
 		|| $this->gsnNodeByHostname($node->hostname()) === false)
@@ -118,6 +184,15 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return true;
 	}
 
+	/**
+	 * Update status/state of node
+	 *
+	 * The status will be set to the information provided in
+	 * the node object
+	 * 
+	 * @param SpringDvs\Node $node The node to update with update details
+	 * @return true if updated; otherwise false
+	 */
 	public function gsnNodeUpdate($node) {
 		$details = $this->geosubNetspace->get($node->springname());
 		
@@ -128,14 +203,27 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return true;
 	}
 
+	/**
+	 * Get root nodes (Not to be used yet)
+	 */
 	public function gtnRootNodes() {
 		
 	}
-
+	
+	/**
+	 * Get list of GSNs (not to be used)
+	 */
 	public function gtnGeosubs() {
 		
 	}
 
+	/**
+	 * Register a new root node in the top network
+	 *
+	 * @param SpringDvs\Node $node The node to register as root
+	 * @param string $geosub The name of the GSN of which the node is a root
+	 * @return true if added; otherwise false
+	 */	
 	public function gtnGeosubRegister($node, $geosub) {
 		$key = $node->springname() ."__".$geosub;
 		if($this->geotopNetspace->get($key) !== false)
@@ -153,6 +241,13 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return true;
 	}
 
+	/**
+	 * Unregister a new root node from the top network
+	 *
+	 * @param SpringDvs\Node $node The node to unregister as root
+	 * @param string $geosub The name of the GSN of which the node was a root
+	 * @return true if removed; otherwise false
+	 */	
 	public function gtnGeosubUnregister($node, $geosub) {
 
 		$key = $node->springname() ."__".$geosub;
@@ -164,6 +259,12 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return true;
 	}
 
+	/**
+	 * Get root nodes of a GSN
+	 *
+	 * @param string $geosub The name of the GSN
+	 * @return array of \SpringDvs\Node objects; otherwise empty array 
+	 */
 	public function gtnGeosubRootNodes($geosub) {
 
 		$list = array();
@@ -177,6 +278,13 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return $list;
 	}
 
+	/**
+	 * Get a root node of GSN by it's springname
+	 *
+	 * @param string $springname The springname of node
+	 * @param string $geosub The name of the GSN of which the node is a root
+	 * @return \SpringDvs\Node if found; otherwise false
+	 */
 	public function gtnGeosubNodeBySpringname($springname, $geosub) {
 		$key = $springname ."__".$geosub;
 		$v = $this->geotopNetspace->get($key);
@@ -186,14 +294,29 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		return $this->constructRootNode($springname, $v);		
 	}
 	
+	/**
+	 * Get a handle to the internal GSN database object
+	 */
 	public function &dbGsn() {
 		return $this->geosubNetspace;
 	}
 	
+	/**
+	 * Get a handle to the internal GTN database object
+	 */
 	public function &dbGtn() {
 		return $this->geotopNetspace;
 	}
 	
+	/**
+	 * Construct a node from springname and details from store
+	 * 
+	 * This is used to fill out a node from the information retrieved
+	 * from the database
+	 * 
+	 * @param string $springname The springname of the node
+	 * @param array $details Details of the node 
+	 */
 	private function constructNode($springname, $details) {
 		return new SpringDvs\Node(
 				$springname, 
@@ -205,6 +328,14 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		);
 	}
 	
+	/**
+	 * Dodgy construction of Root node from top netspace
+	 * 
+	 * Please see ToDo in netlib
+	 * 
+	 * @param string $springname The springname of the node
+	 * @param array $details Details of the node 
+	 */
 	private function constructRootNode($springname, $details) {
 		$vals = explode("__", $springname);
 		return new SpringDvs\Node(
@@ -218,6 +349,10 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	}
 }
 
+
+/**
+ * Live testing environment functions
+ */
 
 function reset_live_env(NetspaceKvs $nio) {
 	if(!\SpringDvs\Config::$spec['testing']) return;
