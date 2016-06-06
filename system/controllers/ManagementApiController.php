@@ -4,7 +4,23 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
+/**
+ * Provide all the functionality for node management via web API
+ *
+ */
 class ManagementApiController {
+	
+	/**
+	 * Resolve and run an action
+	 * 
+	 * Resovles the method by convention. example:
+	 * 
+	 *   /api/overview/get/ => ManagementApiContoller::overviewGet()
+	 *   /api/updates/post/ => ManagementApiContoller::updatesPost()
+	 *   
+	 * @param array $func Flight route array
+	 * @return JSON encoded string response
+	 */
 	public function request($func) {
 
 		$method = "";
@@ -34,8 +50,14 @@ class ManagementApiController {
 		return $this->$method();
 	}
 	
+	/**
+	 * Retrieve the overview details of the node
+	 * 
+	 * 
+	 * This cannot be used through remote API
+	 */
 	private function overviewGet() {
-		if(!defined('NODE_LOCAL')) return [];
+		if(!defined('NODE_LOCAL')) return "{}";
 		
 		return json_encode( array(
 			'springname' => \SpringDvs\Config::$spec['springname'],
@@ -53,6 +75,9 @@ class ManagementApiController {
 		) );
 	}
 	
+	/**
+	 * Get the network uri of node
+	 */
 	private function springnetGet() {
 		return json_encode([
 			'springname' => \SpringDvs\Config::$spec['springname'],
@@ -60,6 +85,9 @@ class ManagementApiController {
 				]);
 	}
 	
+	/**
+	 * Get the list of packages queued for updates
+	 */
 	private function updatesGet() {
 		$checker = new UpdateCheck(new VersionHandler(), new ModuleHandler(), new CoreHandler(), new SystemUpdateKvs());
 		$queue = $checker->getUpdateQueue();
@@ -80,7 +108,12 @@ class ManagementApiController {
 		return json_encode($out);
 	}
 	
-	private function updatesPost($service) {
+	/**
+	 * Perform update action across all queued packages
+	 * 
+	 * Warning: This action is desctructive!
+	 */
+	private function updatesPost() {
 		$status = array('nws' => array(),'gws' => array(),'core' => array());
 		$checker = new UpdateCheck(new VersionHandler(), new ModuleHandler(), new CoreHandler(), new SystemUpdateKvs());
 		$runner = new UpdateRunner(new PackageHandler());
@@ -102,6 +135,11 @@ class ManagementApiController {
 		return json_encode($status);
 	}
 	
+	/**
+	 * Perform a node registration with the GSN
+	 * 
+	 * This cannot be used through remote API
+	 */
 	private function registerPost() {
 		if(!defined('NODE_LOCAL')) return "{}";
 		$frame = new SpringDvs\FrameRegistration(
@@ -116,6 +154,11 @@ class ManagementApiController {
 		return \SpringDvs\HttpService::jsonEncodePacket($packet);
 	}
 	
+	/**
+	 * Update the state of the node in the GSN
+	 * 
+	 * This cannot be used through remote API
+	 */
 	private function statePost() {
 		if(!defined('NODE_LOCAL')) return '{}';
 		
@@ -132,6 +175,11 @@ class ManagementApiController {
 		return \SpringDvs\HttpService::jsonEncodePacket($packet);
 	}
 	
+	/**
+	 * Request the state of the node in the GSN
+	 * 
+	 * This cannot be used through remote API
+	 */
 	private function stateGet() {
 		if(!defined('NODE_LOCAL')) return "{}";
 
@@ -147,14 +195,26 @@ class ManagementApiController {
 		return \SpringDvs\HttpService::jsonEncodePacket($packet);
 	}
 	
+	/**
+	 * Get list of gateway services
+	 */
 	private function gwservicesGet() {
 		return json_encode($this->extractServices('system/modules/gateway/'));
 	}
 	
+	/**
+	 * get list of network services
+	 */
 	private function nwservicesGet() {
 		return json_encode($this->extractServices('system/modules/network/'));
 	}
 	
+	/**
+	 * extract services of type
+	 * @todo Use the module handler instead
+	 * 
+	 * @param string $root The servoce type 
+	 */
 	private function extractServices($root) {
 		$dirs = array_filter(glob($root.'/*'), 'is_dir');
 		$result = array();
@@ -169,13 +229,30 @@ class ManagementApiController {
 		return $result;		
 	}
 	
+	/**
+	 * Pass a get request onto a network service
+	 * 
+	 * @param string $service The service to request
+	 */
 	private function nwserviceGet($service) {
 		return $this->networkService($service, 'Get');
 	}
+	
+	/**
+	 * Pass a post request onto a network service
+	 *
+	 * @param string $service The service to request
+	 */
 	private function nwservicePost($service) {
 		return $this->networkService($service, 'Post');
 	}
 	
+	/**
+	 * Perform the request with the specified network service
+	 * 
+	 * @param string $service The service to request
+	 * @param string $method The method of request (get|post)
+	 */
 	private function networkService($service, $method) {
 		$file = "system/modules/network/$service/config/controller.php";
 		

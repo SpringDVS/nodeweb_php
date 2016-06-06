@@ -1,5 +1,13 @@
 <?php
 include __DIR__.'/../handlers/GatewayHandler.php';
+
+/**
+ * Provide the controller interface for gateway services
+ * 
+ * This is an internal object that passes the request onto the 
+ * gateway request handler
+ *
+ */
 class GatewayApiController {
 	public function request($service) {
 		

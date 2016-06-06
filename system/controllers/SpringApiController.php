@@ -4,7 +4,17 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
+/**
+ * The controller interface for internal Spring network requests
+ *
+ * This object takes an HTTP service layer request and passes in the 
+ * binary of the springDVS packet.
+ * 
+ * @return string encoded \SpringDvs\DvspPacket response
+ */
 class SpringApiController {
+	
+	
 	public function request() {
 		$request = trim(Flight::request()->getBody());
 		

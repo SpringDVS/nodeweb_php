@@ -10,6 +10,9 @@ Flight::register('manApi', 'ManagementApiController');
 Flight::register('springApi', 'SpringApiController');
 Flight::register('gatewayApi', 'GatewayApiController');
 
+/**
+ * These are the node management routes
+ */
 Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $zone, $method, $service, $route) {
 	
 	session_start();
@@ -20,7 +23,11 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	$scriptsBottom =  array();
 	
 	$masterView = 'master_node_config';
+	
+	// Check if we are using external API token
 	if( ($token = filter_input(INPUT_POST, '__token')) !== null) {
+		
+		// Check if token is correct
 		if($token == \SpringDvs\Config::$sys['api_token'] && $area == 'api') {
 			define('NODE_ADMIN', true); // We are in admin mode
 			$updater->check(CHK_UPDATE_MODULES|CHK_UPDATE_CORE);
@@ -93,6 +100,9 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	
 }, true);
 
+/**
+ * This is the internal spring network interface route
+ */
 Flight::route('/spring/', function() {
 	// This is the server interface for the node
 	$response = Flight::springApi()->request();
@@ -100,6 +110,9 @@ Flight::route('/spring/', function() {
 	
 }, true);
 
+/**
+ * This is the external gateway service route
+ */
 Flight::route('/gateway/@service/*', function($service, $route) {
 	
 	// This is the gateway interface for the node
