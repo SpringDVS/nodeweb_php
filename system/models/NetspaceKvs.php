@@ -5,10 +5,9 @@
  */
 
 use Flintstone\Flintstone;
-use SpringDvs;
 use SpringDvs\Node;
 use SpringDvs\DvspNodeState;
-use SpringDvs;
+
 
 /**
  * Provides Key-Value Store implementation of the netspace model

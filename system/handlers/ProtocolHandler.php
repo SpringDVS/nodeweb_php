@@ -4,9 +4,6 @@
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
  */
 
-include __DIR__.'/../models/NetspaceKvs.php';
-include __DIR__.'/../models/Resolution.php';
-include 'RequestHandler.php';
 /**
  * The protocol handler for processing packets as a SpringDVS node
  * and sometimes a root node if it has been elevated
@@ -22,7 +19,7 @@ class ProtocolHandler {
 	 * @return bytes of serialised response
 	 */
 	public static function processBytes($bytes) {
-		$nio = new NetspaceKvs(true, 'system/store/testunit/');
+		$nio = new NetspaceKvs(false);
 		$packet = SpringDvs\DvspPacket::deserialise($bytes);
 		if(!$packet) {
 			$response = self::rcodePacket(\SpringDvs\DvspRcode::malformed_content);
