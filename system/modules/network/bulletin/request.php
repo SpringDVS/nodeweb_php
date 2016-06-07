@@ -12,6 +12,15 @@ $bulletins = $db->getAll();
 $final = [];
 $queries = [];
 
+if(isset($rpath[0]) && !empty($rpath[0])) {
+
+	foreach($bulletins as &$value) {
+		if(!isset($value['uid']) || $value['uid'] != $rpath[0]) continue;
+		
+		return $value;
+	}
+	return array();
+}
 
 
 parse_str($url->query(), $queries);
@@ -24,15 +33,17 @@ if(isset($queries['tags'])) {
 		foreach($tags as $tag) {
 			if(in_array(trim($tag), $qtags)){ 
 				$value['tags'] = $tags;
-				$final[$key] = $value; 
+				$final[$key] = $value;
 			}
 		}
+		unset($value['content']);
 	}
 
 } else {
 	foreach($bulletins as $key => &$value) {
 		$tags = explode(',', $value['tags']);
 		$value['tags'] = $tags;
+		unset($value['content']);
 	}
 	$final = $bulletins;
 }
