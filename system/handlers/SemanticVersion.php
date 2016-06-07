@@ -37,8 +37,13 @@ class SemanticVersion {
 	 * @param SemanticVersion $thisVersion Version to check against
 	 */
 	public function greaterThan(SemanticVersion $thisVersion) {
+		
+		
 		if($this->major > $thisVersion->major) { return true; }
+		
+		if($this->minor < $thisVersion->minor) { return false; }
 		if($this->minor > $thisVersion->minor) { return true; }
+		
 		if($this->patch > $thisVersion->patch) { return true; }
 		return false;
 	}
@@ -48,8 +53,13 @@ class SemanticVersion {
 	 * @param SemanticVersion $thisVersion Version to check against
 	 */
 	public function lessThan(SemanticVersion $thisVersion) {
+		
+		
 		if($this->major < $thisVersion->major) { return true; }
+		
+		if($this->minor > $thisVersion->minor) { return false; }
 		if($this->minor < $thisVersion->minor) { return true; }
+		
 		if($this->patch < $thisVersion->patch) { return true; }
 		return false;
 	}
