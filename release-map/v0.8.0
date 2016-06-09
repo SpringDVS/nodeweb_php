@@ -1,0 +1,7 @@
+Release Map
+v0.8.0
+
+- Implement secure layer
+  - Certificates
+  - Verification protocols
+  - Transparent secure transport
