@@ -6,7 +6,7 @@
 
 use Flintstone\Flintstone;
 use SpringDvs\Node;
-use SpringDvs\DvspNodeState;
+use SpringDvs\NodeState;
 
 
 /**
@@ -50,14 +50,9 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	 */
 	public function gsnNodesByAddress($address) {
 		
-		$addr = is_string($address) ? 
-				$address : 
-				SpringDvs\Node::addressToString($address);
-		
-				
 		foreach($this->geosubNetspace->getKeys() as $s) {
 			$v = $this->geosubNetspace->get($s);
-			if($v['address'] == $addr) {
+			if($v['address'] == $address) {
 				return $this->constructNode ($s, $v);
 			}
 		}
@@ -73,7 +68,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	public function gsnNodeByHostname($hostname) {
 		foreach($this->geosubNetspace->getKeys() as $s) {
 			$v = $this->geosubNetspace->get($s);
-			if($v['hostname'] == $hostname) {
+			if($v['host'] == $hostname) {
 				return $this->constructNode ($s, $v);
 			}
 		}
@@ -104,7 +99,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		$list = array();
 		foreach($this->geosubNetspace->getKeys() as $s) {
 			$v = $this->geosubNetspace->get($s);
-			if($v['types'] & $types) {
+			if($v['role'] & $types) {
 				$list[] = $this->constructNode ($s, $v);
 			}
 		}
@@ -115,14 +110,14 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	/**
 	 * Get all nodes by state
 	 *
-	 * @param SpringDvs\DvspNodeState $state State to check against
+	 * @param SpringDvs\NodeState $state State to check against
 	 * @return Array of SpringDvs\Node on success; otherwise empty array
 	 */
 	public function gsnNodesByState($state) {
 		$list = array();
 		foreach($this->geosubNetspace->getKeys() as $s) {
 			$v = $this->geosubNetspace->get($s);
-			if($v['status'] == $state) {
+			if($v['state'] == $state) {
 				$list[] = $this->constructNode ($s, $v);
 			}
 		}
@@ -152,19 +147,19 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	 * @return true if registered; otherwise false
 	 */
 	public function gsnNodeRegister($node) {
-		if($this->geosubNetspace->get($node->springname()) !== false
-		|| $this->gsnNodeByHostname($node->hostname()) !== false)
+		if($this->geosubNetspace->get($node->spring()) !== false
+		|| $this->gsnNodeByHostname($node->host()) !== false)
 			return false; 
  
 		$nodeArray = array(
-			'hostname' => $node->toHostResource(),
-			'address' => SpringDvs\Node::addressToString($node->address()),
+			'host' => $node->host(),
+			'address' => $node->address(),
 			'service' => $node->service(),
-			'status' => SpringDvs\DvspNodeState::disabled,
-			'types' => $node->types(),
+			'state' => SpringDvs\NodeState::Disabled,
+			'role' => $node->role(),
 		);
 		
-		$this->geosubNetspace->set($node->springname(), $nodeArray);
+		$this->geosubNetspace->set($node->spring(), $nodeArray);
 		return true;
 	}
 
@@ -175,11 +170,11 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	 * @return true if unregistered; otherwise false
 	 */
 	public function gsnNodeUnregister($node) {
-		if($this->geosubNetspace->get($node->springname()) === false 
-		|| $this->gsnNodeByHostname($node->hostname()) === false)
+		if($this->geosubNetspace->get($node->spring()) === false 
+		|| $this->gsnNodeByHostname($node->host()) === false)
 			return false;
 
-		$this->geosubNetspace->delete($node->springname());
+		$this->geosubNetspace->delete($node->spring());
 		return true;
 	}
 
@@ -193,12 +188,12 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	 * @return true if updated; otherwise false
 	 */
 	public function gsnNodeUpdate($node) {
-		$details = $this->geosubNetspace->get($node->springname());
+		$details = $this->geosubNetspace->get($node->spring());
 		
 		if($details === false) return false;
-		$details['status'] = $node->state();
+		$details['state'] = $node->state();
 		
-		$this->geosubNetspace->set($node->springname(), $details);
+		$this->geosubNetspace->set($node->spring(), $details);
 		return true;
 	}
 
@@ -224,15 +219,15 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	 * @return true if added; otherwise false
 	 */	
 	public function gtnGeosubRegister($node, $geosub) {
-		$key = $node->springname() ."__".$geosub;
+		$key = $node->spring() ."__".$geosub;
 		if($this->geotopNetspace->get($key) !== false)
 			return false; 
  
 		$nodeArray = array(
-			'hostname' => $node->toHostResource(),
-			'address' => SpringDvs\Node::addressToString($node->address()),
+			'host' => $node->host(),
+			'address' => $node->address(),
 			'service' => $node->service(),
-			'priority' => SpringDvs\DvspNodeState::disabled,
+			'priority' => SpringDvs\NodeState::Disabled,
 			'geosub' => $geosub,
 		);
 		
@@ -249,7 +244,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	 */	
 	public function gtnGeosubUnregister($node, $geosub) {
 
-		$key = $node->springname() ."__".$geosub;
+		$key = $node->spring() ."__".$geosub;
 
 		if($this->geotopNetspace->get($key) === false)
 			return false; 
@@ -319,11 +314,11 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 	private function constructNode($springname, $details) {
 		return new SpringDvs\Node(
 				$springname, 
-				$details['hostname'],
-				SpringDvs\Node::addressFromString($details['address']),
+				$details['host'],
+				$details['address'],
 				$details['service'],
-				$details['status'],
-				$details['types']
+				$details['state'],
+				$details['role']
 		);
 	}
 	
@@ -339,11 +334,11 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 		$vals = explode("__", $springname);
 		return new SpringDvs\Node(
 				$vals[0], 
-				$details['hostname'],
-				SpringDvs\Node::addressFromString($details['address']),
+				$details['host'],
+				$details['address'],
 				$details['service'],
-				SpringDvs\DvspNodeState::unspecified,
-				SpringDvs\DvspNodeType::undefined
+				SpringDvs\NodeState::Unspecified,
+				SpringDvs\NodeRole::Unknown
 		);
 	}
 }
@@ -367,21 +362,22 @@ function reset_live_env(NetspaceKvs $nio) {
 function update_address_live_env(NetspaceKvs $nio, $nodestr) {
 	if(!\SpringDvs\Config::$spec['testing']) return false;
 	
-	$node = SpringDvs\Node::from_nodestring($nodestr);
-	$current = $nio->dbGsn()->get($node->springname());
+	$node = SpringDvs\Node::from_str($nodestr);
+	$current = $nio->dbGsn()->get($node->spring());
 	if(!$current) return false;
 	
-	$current['address'] = \SpringDvs\Node::addressToString($node->address());
-	$nio->dbGsn()->set($node->springname(), $current);
+	$current['address'] = $node->address();
+	$nio->dbGsn()->set($node->spring(), $current);
 	return true;
 }
 
 function add_geosub_root_live_env(NetspaceKvs $nio, $nodestr) {
 	if(!\SpringDvs\Config::$spec['testing']) return false;
-	
-	$node = \SpringDvs\Node::from_nodestring($nodestr);
-	$node->updateService(\SpringDvs\DvspService::dvsp);
-	$geosub = \SpringDvs\Node::geosubFromNodeRegister($nodestr);
+	$parts = explode(",", $nodestr);
+	$ns = implode(",", array_slice($parts, 0, count($parts)-1));
+	$node = \SpringDvs\Node::from_str($ns);
+	$node->updateService(new \SpringDvs\NodeService(\SpringDvs\NodeService::Dvsp));
+	$geosub = $parts[count($parts)-1];
 	if(!$geosub) return false;
 	
 	$nio->gtnGeosubRegister($node, $geosub);
