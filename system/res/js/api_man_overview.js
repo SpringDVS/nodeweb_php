@@ -13,13 +13,16 @@ var ManOverviewController = {
     },
 
     refreshStatus: function () {
+
         $.getJSON('/node/api/state/get', function(data) {
             status = "Unknown";
             reg = "Unregistered"
-            if(data.type == 34) {
-                switch(data.content.status) {
-                    case 0: status = "Disabled"; break;
-                    case 1: status = "Enabled"; break;
+            	
+            if(data.code == "200" && data.type == "node") {
+                if(data.content.state == "disabled") {
+                    status = "Disabled";
+                } else {
+                    status = "Enabled";
                 }
                 reg = "Registered";
             }
@@ -75,12 +78,11 @@ var ManOverviewController = {
     },
     
     actionRegister: function() {
-        
+        alert("Sendnig");
        $.getJSON('/node/api/register/push/', function(data) {
             $("#action-error").text("");
-            if(data.type == 30
-            && data.frame == "FrameResponse"
-            && data.content.code == 200) {
+            
+            if(data.content.code == "200") {
                 ManOverviewController.refreshStatus();
             } else {
                 $("#action-error").text("Error registering on network");

@@ -1,4 +1,6 @@
 <?php
+use SpringDvs\Message;
+
 /* Notice:  Copyright 2016, The Care Connections Initiative c.i.c.
  * Author:  Charlie Fyvie-Gauld <cfg@zunautica.org>
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
@@ -9,7 +11,7 @@
  *
  */
 class ManagementApiController {
-	
+
 	/**
 	 * Resolve and run an action
 	 * 
@@ -65,7 +67,7 @@ class ManagementApiController {
 			'service' => \SpringDvs\Config::$net['service'],
 			'address' => $_SERVER['SERVER_ADDR'],
 			
-			'primary_addr' => \SpringDvs\Config::$net['master'],
+			'primary_addr' => \SpringDvs\Config::$net['primary'],
 			'geosub' => \SpringDvs\Config::$net['geosub'] . '.' . \SpringDvs\Config::$net['geotop'],
 			'status' => "Unknown",
 			'register' => "Unregistered",
@@ -142,16 +144,12 @@ class ManagementApiController {
 	 */
 	private function registerPost() {
 		if(!defined('NODE_LOCAL')) return "{}";
-		$frame = new SpringDvs\FrameRegistration(
-						true, 
-						SpringDvs\DvspNodeType::org, 
-						SpringDvs\DvspService::http, 
-						SpringDvs\nodereg_from_config(),
-						SpringDvs\Config::$spec['token']);
-		
-		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_registration, $frame->serialise());
-		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['master'], SpringDvs\hostres_from_config());
-		return \SpringDvs\HttpService::jsonEncodePacket($packet);
+
+		$nodeDouble = \SpringDvs\nodedouble_from_config();
+		$token = SpringDvs\Config::$spec['token'];
+		$m = Message::fromStr("register {$nodeDouble};org;http;$token");
+		$response = SpringDvs\HttpService::send($m, SpringDvs\Config::$net['primary'], \SpringDvs\Config::$net['hostname']);
+		return json_encode($response->toJsonArray());
 	}
 	
 	/**
@@ -165,14 +163,16 @@ class ManagementApiController {
 		if(!isset($_GET['state'])) return "{}";
 		
 		$state = $_GET['state'];
+		
 		if($state == "enabled") {
-			$frame = new SpringDvs\FrameStateUpdate(SpringDvs\DvspNodeState::enabled, \SpringDvs\Config::$spec['springname']);
+			$msg = Message::fromStr('update '.\SpringDvs\Config::$spec['springname'].' state enabled');
 		} else {
-			$frame = new SpringDvs\FrameStateUpdate(SpringDvs\DvspNodeState::disabled, \SpringDvs\Config::$spec['springname']);
+
+			$msg = Message::fromStr('update '.\SpringDvs\Config::$spec['springname'].' state disabled');
 		}
-		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_state, $frame->serialise());
-		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['master'], SpringDvs\hostres_from_config());	
-		return \SpringDvs\HttpService::jsonEncodePacket($packet);
+		
+		$response = SpringDvs\HttpService::send($msg, SpringDvs\Config::$net['primary'], SpringDvs\Config::$net['hostname']);	
+		return json_encode($response->toJsonArray());
 	}
 	
 	/**
@@ -185,14 +185,12 @@ class ManagementApiController {
 
 		$springname = \SpringDvs\Config::$spec['springname'];
 		
-		if(isset($_GET['springname'])) $springname = $_GET['springname'];
+		if(isset($_GET['springname'])){ $springname = $_GET['springname']; }
 		
-		$frame = new SpringDvs\FrameStatusRequest($springname);
-
-		$p = SpringDvs\DvspPacket::ofType(SpringDvs\DvspMsgType::gsn_node_status, $frame->serialise());
-		$packet = SpringDvs\HttpService::sendPacket($p, SpringDvs\Config::$net['master'], SpringDvs\hostres_from_config());
-
-		return \SpringDvs\HttpService::jsonEncodePacket($packet);
+		$msg = SpringDvs\Message::fromStr("info node $springname state");
+		
+		$response = SpringDvs\HttpService::send($msg, SpringDvs\Config::$net['primary'], SpringDvs\Config::$net['hostname']);	
+		return json_encode($response->toJsonArray());
 	}
 	
 	/**
