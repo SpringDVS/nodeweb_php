@@ -29,20 +29,14 @@ class RequestHandler {
 	 * @param string $urlstr The URI
 	 * @return SpringDvs\DvspPacket The response packet
 	 */
-	public static function process($urlstr) {
-		$url = new \SpringDvs\Url($urlstr);
+	public static function process($url) {
+		
 		if($url->route()[0] != \SpringDvs\Config::$spec['springname']) {
-			$frame = new \SpringDvs\FrameResponse(SpringDvs\DvspRcode::netspace_error);
-			return \SpringDvs\DvspPacket::ofType(
-					\SpringDvs\DvspMsgType::gsn_response, $frame->serialise()
-			);
+			return "101";
 		}
 		$rpath = $url->res();
 		if(!$rpath) {
-			$frame = new \SpringDvs\FrameResponse(SpringDvs\DvspRcode::malformed_content);
-			return \SpringDvs\DvspPacket::ofType(
-					\SpringDvs\DvspMsgType::gsn_response, $frame->serialise()
-					);
+			return "104";
 		}
 		$res = $rpath[0];
 		$rpath = array_slice($rpath, 1);
@@ -52,28 +46,18 @@ class RequestHandler {
 		$lock =  "system/modules/network/$res/update.lock";
 
 		if(!file_exists($path) || !file_exists($ipath) || file_exists($lock)) {
-			$frame = new \SpringDvs\FrameResponse(SpringDvs\DvspRcode::malformed_content);
-			return \SpringDvs\DvspPacket::ofType(
-					\SpringDvs\DvspMsgType::gsn_response, $frame->serialise()
-			);
+			return "122"; // Unsupported service
 		}
 		
 		$response = include "$path";
 		$info = include "$ipath";
 		$node = \SpringDvs\nodeurl_from_config();
 		
-		/*
-		 * ToDo:
-		 * This could be messagepack instead of JSON
-		 */
-		
+			
 		$out = $info['encoding'] == 'json' 
-				? json_encode([$node => $response])
+				? '/text '.json_encode([$node => $response])
 				: $response;
 
-		return \SpringDvs\DvspPacket::ofType(
-					\SpringDvs\DvspMsgType::gsn_response_high,
-					$out
-			);
+		return '200 service' . $out;
 	}
 }

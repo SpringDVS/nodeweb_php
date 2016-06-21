@@ -17,12 +17,11 @@ class SpringApiController {
 	
 	public function request() {
 		$request = trim(Flight::request()->getBody());
-		
-		$in = SpringDvs\hex_to_bin($request);
+
 		define('SPRING_IF', true);
-		$out = ProtocolHandler::processBytes($in);
+		$out = ProtocolHandler::process($request);
 		
-		return \SpringDvs\bin_to_hex($out);
+		return $out;
 		
 	}
 }

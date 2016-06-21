@@ -78,11 +78,11 @@ var ManOverviewController = {
     },
     
     actionRegister: function() {
-        alert("Sendnig");
+
        $.getJSON('/node/api/register/push/', function(data) {
             $("#action-error").text("");
             
-            if(data.content.code == "200") {
+            if(data.code == "200") {
                 ManOverviewController.refreshStatus();
             } else {
                 $("#action-error").text("Error registering on network");
