@@ -388,7 +388,7 @@
 	\SpringDvs\Config::\$spec['password'] = \"$pass\";
 	\SpringDvs\Config::\$spec['token'] = \"$token\";
 
-	\SpringDvs\Config::\$net['master'] = \"$primaryAddress\";
+	\SpringDvs\Config::\$net['primary'] = \"$primaryAddress\";
 	\SpringDvs\Config::\$net['hostname'] = \"$primaryHostname\";
 	\SpringDvs\Config::\$net['hostres'] = \"$primaryService\";
 	\SpringDvs\Config::\$net['geosub'] = \"$geosub\";
