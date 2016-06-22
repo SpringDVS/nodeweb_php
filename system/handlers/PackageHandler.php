@@ -54,7 +54,7 @@ class PackageHandler implements IPackageHandler {
 	 * @return true if valid; otherwise false
 	 */
 	public function validate($archive, $checksum) {
-		$digest = sha1_file($archive);
+		$digest = hash_file('sha256', $archive);
 		if($digest != $checksum) return false;
 		return true;
 	}

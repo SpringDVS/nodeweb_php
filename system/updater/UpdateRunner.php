@@ -81,7 +81,7 @@ class UpdateRunner {
 		$package = "$prefix.{$module}_{$info['version']}.tgz";		
 
 
-		$path = $this->pull($package, $info['sha1']);
+		$path = $this->pull($package, $info['sha256']);
 		if($path == self::FAIL_DOWNLOAD || $path == self::FAIL_CHECKSUM) {
 			return $path;
 		}
