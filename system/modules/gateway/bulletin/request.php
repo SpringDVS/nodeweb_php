@@ -1,7 +1,5 @@
 <?php
 
-
-
 $uri = filter_input(INPUT_GET, "__req");
 
 if(!$uri) {
@@ -15,33 +13,37 @@ $qdata = count($qs) ? "?".http_build_query($qs) : "";
 
 $request = "spring://".$uri."/bulletin/".$qdata;
 
-$packet = SpringDvs\DvspPacket::ofType(\SpringDvs\DvspMsgType::gsn_resolution, $request);
 
-$status = SpringDvs\HttpService::sendPacket($packet, \SpringDvs\Config::$net['master'],  SpringDvs\hostres_from_config());
+$nodes = GatewayHandler::resolveUri($request);
 
-if(!$status){ return ['status' => 'error', 'uri' => $request]; }
-if($status->header()->type == SpringDvs\DvspMsgType::gsn_response){ return ['status' => 'error', 'uri' => $request]; }
+if($nodes === false){ return ['status' => 'error', 'uri' => $request,'reason' => 'Resolution failed']; }
 
-$frame = $status->contentAs(\SpringDvs\FrameNodeInfo::contentType());
-$node = \SpringDvs\Node::fromNoderegAddr($frame->name, $frame->address);
-$rqpacket = SpringDvs\DvspPacket::ofType(\SpringDvs\DvspMsgType::gsn_request, $request);
+try {
+	$message = \SpringDvs\Message::fromStr("service $request");
+} catch(\Exception $e) {
+	return ['status' => 'error', 'uri' => $request];
+}
 
+$response = GatewayHandler::outboundFirstResponse($message, $nodes);
 
-$in = SpringDvs\HttpService::sendPacket($rqpacket, \SpringDvs\Node::addressToString($node->address()),  $node->hostname()."/spring/");
-if(!$in){ return ['status' => 'error', 'uri' => $request]; }
-if($in->header()->type == SpringDvs\DvspMsgType::gsn_response){ return ['status' => 'error', 'uri' => $request]; }
-if($in->header()->type != SpringDvs\DvspMsgType::gsn_response_high){ return ['status' => 'error', 'uri' => $request]; }
+if($response === null) {
+	return ['status' => 'error', 'uri' => $request, 'reason' => 'Request failed'];
+}
 
-$v = explode('|', $in->content());
-$nodes = array();
+if($response->content()->type() != \SpringDvs\ContentResponse::ServiceText) {
+	return ['status' => 'error', 'uri' => $request, 'reason' => 'Invalid service response type'];
+}
+
+$v = explode('|', $response->content()->content()->get());
+$serviced = array();
 foreach($v as $k => $val) {
 	if($val == "") continue;
-	$nodes[$k] = json_decode($val);
+	$serviced[$k] = json_decode($val);
 }
 
 $dec = [
 	"status" => 'ok',
-	"content" => $nodes
+	"content" => $serviced
 	];
 
 return $dec;
