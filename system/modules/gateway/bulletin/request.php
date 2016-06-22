@@ -11,7 +11,7 @@ unset($qs['__meta']);unset($qs['__req']);unset($qs['_']);unset($qs['callback']);
 
 $qdata = count($qs) ? "?".http_build_query($qs) : "";
 
-$request = "spring://".$uri."/bulletin/".$qdata;
+$request = "spring://".$uri.$qdata;
 
 
 $nodes = GatewayHandler::resolveUri($request);

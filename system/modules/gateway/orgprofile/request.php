@@ -1,7 +1,6 @@
 <?php
 
 
-
 $uri = filter_input(INPUT_GET, "__req");
 
 if(!$uri) {
@@ -13,38 +12,39 @@ unset($qs['__meta']);unset($qs['__req']);unset($qs['_']);unset($qs['callback']);
 
 $qdata = count($qs) ? "?".http_build_query($qs) : "";
 
-$request = "spring://".$uri."/orgprofile/".$qdata;
+$request = "spring://".$uri.$qdata;
 
 
-$packet = SpringDvs\DvspPacket::ofType(\SpringDvs\DvspMsgType::gsn_resolution, $request);
+$nodes = GatewayHandler::resolveUri($request);
 
-$status = SpringDvs\HttpService::sendPacket($packet, \SpringDvs\Config::$net['master'],  SpringDvs\hostres_from_config());
+if($nodes === false){ return ['status' => 'error', 'uri' => $request,'reason' => 'Resolution failed']; }
 
-if(!$status){ return ['status' => 'error', 'uri' => $request]; }
-if($status->header()->type == SpringDvs\DvspMsgType::gsn_response){ return ['status' => 'error', 'uri' => $request]; }
+try {
+	$message = \SpringDvs\Message::fromStr("service $request");
+} catch(\Exception $e) {
+	return ['status' => 'error', 'uri' => $request];
+}
 
-$frame = $status->contentAs(\SpringDvs\FrameNodeInfo::contentType());
-$node = \SpringDvs\Node::fromNoderegAddr($frame->name, $frame->address);
-$rqpacket = SpringDvs\DvspPacket::ofType(\SpringDvs\DvspMsgType::gsn_request, $request);
+$response = GatewayHandler::outboundFirstResponse($message, $nodes);
 
+if($response === null) {
+	return ['status' => 'error', 'uri' => $request, 'reason' => 'Request failed'];
+}
 
-$in = SpringDvs\HttpService::sendPacket($rqpacket, \SpringDvs\Node::addressToString($node->address()),  $node->hostname()."/spring/");
-if(!$in){ return ['status' => 'error', 'uri' => $request]; }
-if($in->header()->type == SpringDvs\DvspMsgType::gsn_response){ return ['status' => 'error', 'uri' => $request]; }
-if($in->header()->type != SpringDvs\DvspMsgType::gsn_response_high){ return ['status' => 'error', 'uri' => $request]; }
+if($response->content()->type() != \SpringDvs\ContentResponse::ServiceText) {
+	return ['status' => 'error', 'uri' => $request, 'reason' => 'Invalid service response type'];
+}
 
-$v = explode('|', $in->content());
-
-$nodes = array();
+$v = explode('|', $response->content()->content()->get());
+$serviced = array();
 foreach($v as $k => $val) {
 	if($val == "") continue;
-	$nodes[$k] = json_decode($val);
+	$serviced[$k] = json_decode($val);
 }
 
 $dec = [
-	"status" => 'ok',
-	"content" => $nodes
-	];
+		"status" => 'ok',
+		"content" => $serviced
+];
 
 return $dec;
-
