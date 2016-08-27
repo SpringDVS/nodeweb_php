@@ -1,7 +1,6 @@
 <?php
 $Gcm__ = array(
 	'GatewayApiController'=>'controllers/GatewayApiController.php',
-	'KeyringController'=>'controllers/KeyringController.php',
 	'ManagementApiController'=>'controllers/ManagementApiController.php',
 	'SpringApiController'=>'controllers/SpringApiController.php',
 	'CoreHandler'=>'handlers/CoreHandler.php',
@@ -24,7 +23,6 @@ $Gcm__ = array(
 	'SystemUpdateKvs'=>'models/SystemUpdateKvs.php',
 	'UpdateCheck'=>'updater/UpdateCheck.php',
 	'UpdateRunner'=>'updater/UpdateRunner.php',
-	'autoload'=>'vendor/autoload.php',
 );
 spl_autoload_register(function ($class) { 
 	global $Gcm__;

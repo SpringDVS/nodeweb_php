@@ -127,3 +127,23 @@ var ManOverviewController = {
 };
 
 ManOverviewController.init();
+
+$("#services-menu").click(function() {
+	if(!this.showing) {
+		this.showing = true;
+		$(".services-sub").show();
+	} else {
+		this.showing = false;
+		$(".services-sub").hide();		
+	}
+})
+
+$("#keyring-menu").click(function() {
+	if(!this.showing) {
+		this.showing = true;
+		$(".keyring-sub").show();
+	} else {
+		this.showing = false;
+		$(".keyring-sub").hide();		
+	}
+})

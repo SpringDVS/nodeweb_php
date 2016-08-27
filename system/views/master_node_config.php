@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Node Management - Spring DVS</title>
+	<title> <?php echo count($subtitle) ? "$subtitle" : "Node Management"; ?> - Spring DVS</title>
 	<!--[if lt IE 9]>
 	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
@@ -17,7 +17,11 @@
 	<?php 
 	if(isset($scriptsTop)) {
 		foreach($scriptsTop as $s) {
-			echo "<script async type=\"text/javascript\" src=\"/system/res/js/$s\"></script>\n";
+			if(substr($s, 0, 4) == "http") {
+				echo "<script type=\"text/javascript\" src=\"$s\"></script>\n";
+			} else {
+				echo "<script async type=\"text/javascript\" src=\"/system/res/js/$s\"></script>\n";
+			}
 		}
 	}
 	?>
@@ -25,16 +29,44 @@
 
 <body>
 <img id="logo" src="/system/res/img/watermark.png">
-<div id="page" class="pure-g">
-	<header class="pure-u-1-1" id="header-block">
-		<!-- <h4>Node Management</h4> -->
-	</header>
-	<main class="pure-u-1-1 pure-g">
-		<section>			
-			<h1>Node Management</h1>
-		</section>
+<div id="page">
+	<nav class="pure-menu custom-restricted-width">
+		<span class="pure-menu-heading">spring://</span>
 		
-		<?php echo $body_content; ?>
+		<ul class="pure-menu-list">
+	        <li class="pure-menu-item"><a href="/node/" class="pure-menu-link">Overview</a></li>
+	        <li class="pure-menu-item" id="services-menu"><a href="#" class="pure-menu-link">Services</a></li>
+	        <?php 
+	        	foreach($services as $k => $s) {
+	        		echo '<li class="pure-menu-item menu-item-sub services-sub"><a href="/node/service/network/'.$k.'" class="pure-menu-link">'.$s.'</a></li>';
+	        	}
+	        
+	        ?>
+	        
+	        <li class="pure-menu-item" id="keyring-menu"><a href="javascript:void(0);" class="pure-menu-link">Keyring</a></li>
+
+			<li class="pure-menu-item menu-item-sub keyring-sub"><a href="/node/keyring/view/" class="pure-menu-link">View</a></li>
+			<li class="pure-menu-item menu-item-sub keyring-sub"><a href="/node/keyring/import/" class="pure-menu-link">Import</a></li>
+	    
+	    </ul>
+	    <img class="logo" src="/system/res/img/sdvs_text_small.png">
+	</nav>
+	<main class="pure-g">
+		<header class="content pure-u-1-1 content-gutter">
+		<div class="ui-uri"><?php
+			echo 'spring://' . \SpringDvs\Config::$spec['springname'] 
+					. '.' . \SpringDvs\Config::$net['geosub']
+					. '.' . \SpringDvs\Config::$net['geotop'];
+		?></div>
+		
+		<div class="ui-version">v<?php
+			$v = include __DIR__.'/../coreinfo.php';
+			echo $v['version'];
+		?></div>
+		</header>
+		<section class="content">
+			<?php echo $body_content; ?>
+		</section>
 	</main>
 	
 </div>

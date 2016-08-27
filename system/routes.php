@@ -60,7 +60,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 	define('NODE_LOCAL', true); // We are working on the local system
 
 	$updater->check(CHK_UPDATE_MODULES|CHK_UPDATE_CORE);
-
+	$subTitle = "";
 	switch($area) {
 	case 'api':
 		$api = Flight::manApi();
@@ -81,21 +81,47 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 		if(file_exists(__DIR__.$script)) {
 			$scriptsTop[] = "../..".$script;
 		}
-		$masterView = 'master_service_config';
+		$scriptsTop[] = "api_man_overview.js";
+		$subTitle = "Service";
+		//$masterView = 'master_service_config';
 		break;
+	case 'keyring':
+		$subTitle = "Keyring";
+		$scriptsTop[] = "api_man_overview.js";
+		if($zone == "import") {
+			$scriptsTop[] = "key_import.js";
+			
+			Flight::render('keyring_import', null, 'body_content');
+		}else if($zone == "view") {
+			$scriptsTop[] = "key_view.js";
+			
+			Flight::render('keyring_view', null, 'body_content');
+		} else {
 		
+			Flight::render('keyring_main', null, 'body_content');
+		}
+		break;
 	case 'logout':
 		unset($_SESSION['admin']);
 		Flight::redirect('/node/');
 		break;
+		
 	default:
+		$subTitle = "Overview";
 		$scriptsTop[] = "api_man_overview.js";
 		Flight::render('node_config_overview', null, 'body_content');
 	}
 	
+	
+	
 	Flight::render($masterView, array(
+										'subtitle' => $subTitle,
 										'scriptsTop' => $scriptsTop,
 										'scriptsBottom' => $scriptsBottom,
+										'services' => array(
+												'bulletin' => 'Bulletin',
+												'orgprofile' => 'Profile',
+										)
 				));
 	
 }, true);

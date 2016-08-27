@@ -48,7 +48,7 @@ class ManagementApiController {
 		
 		if($ref->getNumberOfParameters() == 1) {
 			return $this->$method($func['service']);
-		} 
+		}
 		return $this->$method();
 	}
 	
@@ -260,5 +260,15 @@ class ManagementApiController {
 		include $file;
 		$controller = new ServiceController();
 		return $controller->request($method);
+	}
+	
+	private function keyringGet($service) {
+		$controller = new KeyringController();
+		return $controller->request($service, 'Get');
+	}
+	
+	private function keyringPost($service) {
+		$controller = new KeyringController();
+		return $controller->request($service, 'Post');
 	}
 }

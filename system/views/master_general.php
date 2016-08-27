@@ -17,7 +17,13 @@
 	<?php 
 	if(isset($scriptsTop)) {
 		foreach($scriptsTop as $s) {
-			echo "<script async type=\"text/javascript\" src=\"/system/res/js/$s\"></script>\n";
+			
+			if(substr($s, 0, 4) == "http") {
+				echo "<script async type=\"text/javascript\" src=\"$s\"></script>\n";
+			} else {
+				echo "<script async type=\"text/javascript\" src=\"/system/res/js/$s\"></script>\n";
+			}
+			
 		}
 	}
 	?>
@@ -27,10 +33,10 @@
 <img id="logo" src="/system/res/img/watermark.png">
 <div id="page" class="pure-g">
 	<header class="pure-u-1-1" id="header-block">
-		<!-- <h4>Node Management</h4> -->
+		
 	</header>
 	<main class="pure-u-1-1 pure-g">
-		<?php echo $body_content; ?>
+	<?php echo $body_content; ?>
 	</main>
 </div>
 	

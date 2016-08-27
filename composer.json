@@ -13,13 +13,23 @@
             "options": {
                 "symlink": true
             }
+        },        	
+        {
+            "type": "vcs",
+            "url": "https://github.com/SpringDVS/php.fork.pearexception"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/SpringDVS/php.fork.cryptgpg"
         }
     ],
 "require": {
     "mikecao/flight": "^1.2.20",
     "springdvs/netlib": "dev-master",
     "springdvs/nodelib": "dev-master",
-    "fire015/flintstone": "^2.0"
+    "fire015/flintstone": "^2.0",
+    "pear/pear_exception" : "dev-springdvs",
+    "pear/crypt_gpg" : "dev-springdvs"
 }
 
 }
