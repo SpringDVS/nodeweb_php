@@ -32,7 +32,14 @@ class KeyringHandler implements IKeyring {
 	}
 	
 	public function getKey($id) {
-		return $this->_keyring->get($id);
+		$key = $this->_keyring->get($id);
+		
+		for($i = 0; $i < count($key['sigs']); $i++) {
+			$keyid = $key['sigs'][$i];
+			$key['sigs'][$i] = [$keyid, $this->getUserId($keyid)];
+		}
+		
+		return $key;
 	}
 	
 	public function getPublicKeyring() {
@@ -65,7 +72,10 @@ $armor
 		
 		return $key['name'];
 	}
-	
+
+	public function removeKey($id) {
+		$this->_keyring->delete($id);
+	}	
 	
 	private function request($body) {
 		$ch = curl_init($this->_remote);
@@ -86,7 +96,13 @@ $armor
 		return $response;
 	}
 	
-	public function removeKey($id) {
-		$this->_keyring->delete($id);
+	private function getUserId($keyid) {
+		$key = $this->_keyring->get($keyid);
+		
+		if(!$key) return "unknown";
+		
+		return $key['name'];
 	}
+	
+
 }

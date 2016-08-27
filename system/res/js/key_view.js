@@ -43,7 +43,7 @@ var KeyringViewController = function() {
 			    	html += response.key.email;
 			    	html += "<h4>Certificate Signatures</h4><ul>";
 			    	for(i = 0; i < response.key.sigs.length; i++) {
-			    		html += "<li>" + response.key.sigs[i] + "</li>";
+			    		html += "<li>" + response.key.sigs[i][0] + "&nbsp;&nbsp;(<em>"+response.key.sigs[i][1]+"</em>)</li>";
 			    	}
 			    	html += "</ul>";
 			    	html += "</div>";
