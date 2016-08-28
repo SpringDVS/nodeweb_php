@@ -2,7 +2,7 @@ var KeyImporterController = function() {
 	
 	this.sendArmor = function() {
 		armorContainer = $('#import-armor');
-		data = "armor="+armorContainer.val();
+		data = "armor="+encodeURIComponent(armorContainer.val());
 
 		$.post(
 		    '/node/api/keyring/post/import',
