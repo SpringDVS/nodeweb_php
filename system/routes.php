@@ -89,16 +89,17 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 		$subTitle = "Keyring";
 		$scriptsTop[] = "api_man_overview.js";
 		if($zone == "import") {
+			$subTitle = "Import - Keyring";
 			$scriptsTop[] = "key_import.js";
-			
 			Flight::render('keyring_import', null, 'body_content');
-		}else if($zone == "view") {
+		} else if($zone == "view") {
+			$subTitle = "Keyring";
 			$scriptsTop[] = "key_view.js";
-			
 			Flight::render('keyring_view', null, 'body_content');
-		} else {
-		
-			Flight::render('keyring_main', null, 'body_content');
+		} else if($zone == "cert") {
+			$subTitle = "Certificate - Keyring";
+			$scriptsTop[] = "key_cert.js";
+			Flight::render('keyring_cert', null, 'body_content');
 		}
 		break;
 	case 'logout':

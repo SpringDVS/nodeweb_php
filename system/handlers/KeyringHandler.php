@@ -34,6 +34,10 @@ class KeyringHandler implements IKeyring {
 	public function getKey($id) {
 		$key = $this->_keyring->get($id);
 		
+		if($id == 'this') {
+			$key = $key['public'];
+		}
+		
 		for($i = 0; $i < count($key['sigs']); $i++) {
 			$keyid = $key['sigs'][$i];
 			$key['sigs'][$i] = [$keyid, $this->getUserId($keyid)];
@@ -54,28 +58,37 @@ class KeyringHandler implements IKeyring {
 	}
 	
 	public function importPublicKey($armor) {
-		$body = "IMPORT
-PUBLIC {
-$armor
-}\n";
-		
-		$result = $this->request($body);
+
+		$result = $this->requestImport($armor);
 		$key = json_decode($result, true);
 
 		
-		$this->_keyring->set($key['keyid'], array(
-			'public' => $armor,
-			'name' => $key['name'],
-			'email' => $key['email'],
-			'sigs' => $key['sigs']
-		));
+		$this->addKey($key, $armor);
 		
 		return $key['name'];
 	}
 
 	public function removeKey($id) {
 		$this->_keyring->delete($id);
-	}	
+	}
+	
+	public function generateKey($name, $email, $passphrase) {
+		$body = "KEYGEN
+$passphrase
+$name
+$email\n";
+		$result = $this->request($body);
+		$obj = json_decode($result, true);
+		
+		$armor = $obj['public'];
+		$json = $this->requestImport($armor);
+		$pub = json_decode($json, true);
+
+		$obj['public'] = $pub;
+		$this->_keyring->set('this', $obj);
+		$this->addKey($pub, $armor);
+		return true;
+	}
 	
 	private function request($body) {
 		$ch = curl_init($this->_remote);
@@ -83,7 +96,7 @@ $armor
 		//curl_setopt($ch, CURLOPT_URL,            $address);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt($ch, CURLOPT_POST,           1 );
-		curl_setopt($ch, CURLOPT_USERAGENT,           "WebSpringDvs" );
+		curl_setopt($ch, CURLOPT_USERAGENT,      "WebSpringDvs" );
 		curl_setopt($ch, CURLOPT_POSTFIELDS,      $body);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_HTTPHEADER,     array(
@@ -102,6 +115,23 @@ $armor
 		if(!$key) return "unknown";
 		
 		return $key['name'];
+	}
+	
+	private function requestImport($armor) {
+		$body = "IMPORT
+PUBLIC {
+$armor
+}\n";	
+		return $this->request($body);
+	}
+	
+	private function addKey($key, $armor) {
+		$this->_keyring->set($key['keyid'], array(
+				'public' => $armor,
+				'name' => $key['name'],
+				'email' => $key['email'],
+				'sigs' => $key['sigs']
+		));		
 	}
 	
 

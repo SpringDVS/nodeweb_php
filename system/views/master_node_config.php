@@ -47,7 +47,7 @@
 
 			<li class="pure-menu-item menu-item-sub keyring-sub"><a href="/node/keyring/view/" class="pure-menu-link">View</a></li>
 			<li class="pure-menu-item menu-item-sub keyring-sub"><a href="/node/keyring/import/" class="pure-menu-link">Import</a></li>
-	    
+			<li class="pure-menu-item menu-item-sub keyring-sub"><a href="/node/keyring/cert/" class="pure-menu-link">Private</a></li>	    
 	    </ul>
 	    <img class="logo" src="/system/res/img/sdvs_text_small.png">
 	</nav>
