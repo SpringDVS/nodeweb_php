@@ -23,12 +23,25 @@ class KeyringHandler implements IKeyring {
 		return $key['private'];
 	}
 	
-	public function setNodePrivateKey() {
-
+	public function setNodePrivateKey($key) {
+		$obj = $this->_keyring->get('this');
+		if(isset($obj['private'])) return false;
+		$obj['private'] = $key;
+		$this->_keyring->set('this', $obj);
+		
+		return true;
 	}
 	
-	public function setNodePublicKey() {
-
+	public function setNodePublicKey($key) {
+		$obj = $this->_keyring->get('this');
+	
+		$json = $this->requestImport($key);
+		$pub = json_decode($json, true);
+		
+		$obj['public'] = $pub;
+		$this->_keyring->set('this', $obj);
+		$this->addKey($pub, $key);
+		return true;
 	}
 	
 	public function getKey($id) {
@@ -64,6 +77,11 @@ class KeyringHandler implements IKeyring {
 
 		
 		$this->addKey($key, $armor);
+		$chk = $this->_keyring->get('this');
+		if($chk && $key['keyid'] == $chk['public']['keyid']) {
+			$chk['public'] = $key;
+			$this->_keyring->set('this', $chk);
+		}
 		
 		return $key['name'];
 	}
