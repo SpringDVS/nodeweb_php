@@ -3,7 +3,7 @@
 interface IKeyring {
 	public function getNodePublicKey();
 	public function getNodePrivateKey();
-	public function setNodePublicKey();
-	public function setNodePrivateKey();
+	public function setNodePublicKey($key);
+	public function setNodePrivateKey($key);
 	public function getPublicKeyring();
 }
