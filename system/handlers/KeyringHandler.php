@@ -1,6 +1,6 @@
 <?php
 use Flintstone\Flintstone;
-if(!defined('NODE_ADMIN')) die();
+if(!defined('NODE_ADMIN') && !defined('NODE_KEYGEN')) die();
 
 class KeyringHandler implements IKeyring {
 	private $_keyring;
@@ -46,15 +46,24 @@ class KeyringHandler implements IKeyring {
 	
 	public function getKey($id) {
 		$key = $this->_keyring->get($id);
+		$nodeKey = $this->getNodeKeyid();
 		
 		if($id == 'this') {
 			$key = $key['public'];
 		}
 		
+		$signed = false;
+		
 		for($i = 0; $i < count($key['sigs']); $i++) {
 			$keyid = $key['sigs'][$i];
 			$key['sigs'][$i] = [$keyid, $this->getUserId($keyid)];
+			
+			if($keyid == $nodeKey) {
+				$signed = true;
+			}	
 		}
+		
+		$key['signed'] = $signed;
 		
 		return $key;
 	}
@@ -88,6 +97,35 @@ class KeyringHandler implements IKeyring {
 
 	public function removeKey($id) {
 		$this->_keyring->delete($id);
+	}
+	
+	public function signCertificate($id, $passphrase) {
+
+		$public = $this->getKeyArmor($id);
+		$private = $this->getNodePrivateKey();
+
+		$body = "SIGN
+$passphrase
+PUBLIC {
+$public
+}
+PRIVATE {
+$private
+}\n";
+		
+		$json = $this->request($body);
+		var_dump($json);
+		$obj = json_decode($json,true);
+		var_dump($obj);
+		if(!$obj) return false;
+		
+		if($public == $obj['public']) {
+			return false;
+		}
+
+		$this->importPublicKey($obj['public']);
+
+		return true;
 	}
 	
 	public function generateKey($name, $email, $passphrase) {
@@ -152,5 +190,19 @@ $armor
 		));		
 	}
 	
-
+	private function getNodeKeyid() {
+		$key = $this->getNodePublicKey();
+		
+		if(!$key || !isset($key['keyid'])) {
+			return null;
+		}
+		return $key['keyid'];
+	}
+	
+	private function getKeyArmor($id) {
+		$key = $this->_keyring->get($id);
+		if(!$key) return null;
+		
+		return $key['public'];
+	}
 }

@@ -19,6 +19,8 @@ class KeyringController {
 			return $this->removePublicKey();
 		} else if($ref == "generate") {
 			return $this->generateKey();
+		} else if($ref == "sign") {
+			return $this->signCertificate();
 		}
 		
 		if($method == "Get") {
@@ -90,5 +92,16 @@ class KeyringController {
 			return json_encode(['result' => 'error']);
 
 		return json_encode(['result' => 'ok']);
+	}
+	
+	private function signCertificate() {
+		$passphrase = filter_input(INPUT_POST, 'passphrase');
+		$keyid = filter_input(INPUT_GET, 'keyid');
+
+		if(!$this->_handler->signCertificate($keyid, $passphrase)) {
+			return json_encode(['result' => 'error']);
+		}
+
+		return json_encode(['result' => 'ok']);			
 	}
 }
