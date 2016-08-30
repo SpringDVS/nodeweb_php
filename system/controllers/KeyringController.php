@@ -50,7 +50,16 @@ class KeyringController {
 	}
 
 	private function privatePost() {
+		$pri = filter_input(INPUT_POST, "private");
+		$pub = filter_input(INPUT_POST, "public");
 		
+		if(!$this->_handler->setNodePrivateKey($pri)) {
+			return json_encode(['result' => 'error','msg' => "Setting private key"]);
+		}
+		
+		$this->_handler->setNodePublicKey($pub);
+		
+		return json_encode(['result' => 'ok']);
 	}
 
 	private function importPost() {
