@@ -228,3 +228,6 @@ table.key-listing-table tr.key-info {
 	background-color: white;
 }
 
+a {
+	text-decoration: none;
+}
