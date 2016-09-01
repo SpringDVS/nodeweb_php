@@ -114,9 +114,7 @@ $private
 }\n";
 		
 		$json = $this->request($body);
-		var_dump($json);
 		$obj = json_decode($json,true);
-		var_dump($obj);
 		if(!$obj) return false;
 		
 		if($public == $obj['public']) {

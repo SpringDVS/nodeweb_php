@@ -122,6 +122,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 										'services' => array(
 												'bulletin' => 'Bulletin',
 												'orgprofile' => 'Profile',
+												'cert' => 'Certificate',
 										)
 				));
 	

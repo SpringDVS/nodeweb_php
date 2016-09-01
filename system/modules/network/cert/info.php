@@ -6,8 +6,8 @@
 if(!defined('NODE_ADMIN') && !defined('SPRING_IF')) return null;
 
 return array(
-	'title' => 'PGP Certificate',
-	'description' => 'Provides the certificate for the node',
+	'title' => 'PKI Certificate',
+	'description' => 'Public Key and Certificate services',
 	'module' => 'cert',
 	'encoding' => 'json',
 	'version' => '0.1.0',

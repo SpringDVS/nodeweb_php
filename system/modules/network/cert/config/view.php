@@ -7,47 +7,32 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 ?>
 
 <div class="pure-u-3-5">
+	
 	<div class="white-container raised">
-		<h3>Organisation Mini-Profile</h3>
-		This is your organisation's profile that is broadcast to the network
-		<div>
-		<table class="pure-table pure-table-horizontal" style="margin-top: 10px;">
-			<tr>
-				<td><strong>Name:</strong></td>
-				<td data-bind="text: name"></td>
-			</tr>
-			
-			<tr>
-				<td><strong>Website:</strong></td>
-				<td data-bind="text: website">Unknown</td>
-			</tr>
+		<h3>Certificate</h3>
+		The following certificate is being broadcast on the network
 
-			<tr>
-				<td><strong>tags:</strong></td>
-				<td data-bind="text: tags">Unknown</td>
-			</tr>
-		</table>
-		
+		<h4 id="userid-name"></h4>
+		<div id="userid-email"></div>
+		<div id="userid-sigs"></div>
+
+		<div>
+			<textarea id="public-key" rows="12" cols="65" class="key-display"></textarea>
 		</div>
+
 	</div>
+
 </div>
 
-<div class="pure-u-2-5">
-	<div class="white-container raised">
-		<h3>Update Profile</h3>
-		<form class="pure-form pure-form-stacked">
-			<fieldset>
-				<label for="bf-name">Organisation Name</label>
-				<input id="bf-name" type="text"  data-bind="value: name" style="width: 100%;">
-				
-				<label for="bf-website">Web Address</label>
-				<input id="bf-website" type="text" data-bind="value: website"  style="width: 100%;">
-				
-				<label for="bf-tags">Tags</label>
-				<input id="bf-tags" type="text" data-bind="value: tags" style="width: 100%;">
 
-			</fieldset>
-		</form>
-		<button onclick="prForm.send()">Update</button>
+<div class="pure-u-2-5">
+ 	<div class="white-container raised">
+		<h3>Options</h3>
+		<div class="pure-form pure-form-stacked">
+ 			<label for="allow_push">
+            	<input id="option_accept_push" name="accept_push" type="checkbox"> Automatically accept pushed certificates
+        	</label>			
+        	<button href="javascript:void(0);" onclick="certClient.postOptions()">Update Options</button>
+		</div>
 	</div>
 </div>
