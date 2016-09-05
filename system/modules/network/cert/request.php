@@ -1,6 +1,8 @@
 <?php
 use Flintstone\Flintstone;
 
+
+
 /* Notice:  Copyright 2016, The Care Connections Initiative c.i.c.
  * Author:  Charlie Fyvie-Gauld <cfg@zunautica.org>
  * License: Apache License, Version 2 (http://www.apache.org/licenses/LICENSE-2.0)
@@ -12,6 +14,63 @@ $keyring = new Flintstone('keyring', $options);
 $queries = [];
 
 parse_str($url->query(), $queries);
+
+
+if(isset($rpath[0]) && $rpath[0] == "pull") {
+	if(!isset($queries['keyid'])) {
+		return array('key' => 'error');
+	}
+	$keyid = $queries['keyid'];
+	
+	$cert = $keyring->get($keyid);
+	if(!$cert)
+		return array('key' => 'error');
+	
+	return array('key' => $cert['public']);
+}
+
+if(isset($rpath[0]) && $rpath[0] == "pullreq") {
+
+	if(!isset($queries['from'])) {
+		return array('result' => 'error');
+	}
+	try {
+		$node = SpringDvs\Node::from_str($queries['from']);
+	} catch(\Exception $e) {
+		return array('result' => 'exception');
+	}
+	$keys = $keyring->get('this');
+
+	if(!isset($keys['public']) || !isset($keys['public']['keyid'])) {
+		return array('result' => 'error');
+	}
+
+	$req = 'service spring://'.$node->spring().'/cert/pull/?keyid='.$keys['public']['keyid'];
+	$msg = SpringDvs\Message::fromStr($req);
+	$respmsg = SpringDvs\HttpService::send($msg, $node->address(), $node->host());
+	if($respmsg->cmd() != SpringDvs\CmdType::Response) {
+		return array('result' => 'error');
+	}
+	
+	if($respmsg->content()->code() != SpringDvs\ProtocolResponse::Ok) {
+		return array('result' => 'error');
+	}
+	
+	if($respmsg->content()->type() != SpringDvs\ContentResponse::ServiceText) {
+		return array('result' => 'error');
+	}
+	$resparr = json_decode($respmsg->content()->content()->get(), true);
+	$response = array_pop($resparr);
+	if($response['key'] == "error") {
+		return array('result' => 'error');
+	}
+	
+	define('CERT_REQ', true);
+	$handler = new KeyringHandler();
+	$handler->importPublicKey($response['key']);
+	
+	return array('result' => 'ok');	
+}
 
 if(empty($queries)) {
 	$keys = $keyring->get('this');
@@ -34,3 +93,4 @@ if(isset($queries['keyonly'])) {
 	
 	return array('key' => $cert['armor']);
 }
+
