@@ -57,7 +57,7 @@ class RequestHandler {
 		$out = $info['encoding'] == 'json' 
 				? '/text '.json_encode([$node => $response])
 				: $response;
-
-		return '200 service' . $out;
+		$len = strlen($out)+7;
+		return '200 ' .$len. ' service' . $out;
 	}
 }
