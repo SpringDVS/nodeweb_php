@@ -144,10 +144,14 @@ class ManagementApiController {
 	 */
 	private function registerPost() {
 		if(!defined('NODE_LOCAL')) return "{}";
-
+		$keyring = new KeyringHandler();
+		
 		$nodeDouble = \SpringDvs\nodedouble_from_config();
 		$token = SpringDvs\Config::$spec['token'];
-		$m = Message::fromStr("register {$nodeDouble};org;http;$token");
+		$key = $keyring->getNodePublicKey();
+		if(!$key) return "{}";
+		$armor = $key['armor'];
+		$m = Message::fromStr("register {$nodeDouble};org;http;$token\n$armor");
 		$response = SpringDvs\HttpService::send($m, SpringDvs\Config::$net['primary'], \SpringDvs\Config::$net['hostname']);
 		return json_encode($response->toJsonArray());
 	}
