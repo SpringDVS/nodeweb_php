@@ -37,6 +37,7 @@ class VersionHandler implements IVersionHandler {
 	 * @return associative array of version information
 	 */
 	public function info($pkg) {
+		
 		try {
 			return json_decode(file_get_contents("{$this->src}/{$pkg}.json"), true);
 		} catch(Exception $e) { return null; }

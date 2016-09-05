@@ -13,7 +13,7 @@ class UpdateRunnerTest extends PHPUnit_Framework_TestCase {
 	public function testModuleNoRemotePackage() {
 		$this->phmock->method('pull')->willReturn(null);
 		$ur = new UpdateRunner($this->phmock);
-		$this->assertEquals(UpdateRunner::FAIL_DOWNLOAD, $ur->serviceNetwork('test', array('version'=>'1.0.0','sha1'=>'foo')));
+		$this->assertEquals(UpdateRunner::FAIL_DOWNLOAD, $ur->serviceNetwork('test', array('version'=>'1.0.0','sha1'=>'foo','sha256'=>'foo')));
 	}
 	
 	public function testModuleInvalidPackage() {
@@ -22,7 +22,7 @@ class UpdateRunnerTest extends PHPUnit_Framework_TestCase {
 		
 		$ur = new UpdateRunner($this->phmock);
 
-		$this->assertEquals(UpdateRunner::FAIL_CHECKSUM, $ur->serviceNetwork('test', array('version'=>'1.0.0','sha1'=>'foo')));		
+		$this->assertEquals(UpdateRunner::FAIL_CHECKSUM, $ur->serviceNetwork('test', array('version'=>'1.0.0','sha1'=>'foo','sha256'=>'foo')));		
 	}
 	
 	public function testModuleValidPackage() {
@@ -32,12 +32,12 @@ class UpdateRunnerTest extends PHPUnit_Framework_TestCase {
 		
 		$this->phmock->method('validate')->willReturn(true);
 		$this->phmock->method('pull')->willReturn("/nws.test_1.0.0.tgz");
-		$this->phmock->method('unpack')->with( $this->equalTo('/nws.test_1.0.0.tgz'), $this->equalTo('system/modules/network/'))
+		$this->phmock->method('unpack')->with( $this->equalTo('/nws.test_1.0.0.tgz'), $this->equalTo('system/modules/network'))
 						->willReturn(true);
 		
 		$ur = new UpdateRunner($this->phmock);
 		
-		$this->assertEquals(UpdateRunner::OK, $ur->serviceNetwork('test', array('version'=>'1.0.0','sha1'=>'foo')));		
+		$this->assertEquals(UpdateRunner::OK, $ur->serviceNetwork('test', array('version'=>'1.0.0','sha1'=>'foo','sha256'=>'foo')));		
 		
 		rmdir('system/modules/network/test');
 		rmdir('system/modules/network');
@@ -48,7 +48,7 @@ class UpdateRunnerTest extends PHPUnit_Framework_TestCase {
 	public function testCoreNoRemotePackage() {
 		$this->phmock->method('pull')->willReturn(null);
 		$ur = new UpdateRunner($this->phmock);
-		$this->assertEquals(UpdateRunner::FAIL_DOWNLOAD, $ur->core(array('version'=>'1.0.0','sha1'=>'foo')));
+		$this->assertEquals(UpdateRunner::FAIL_DOWNLOAD, $ur->core(array('version'=>'1.0.0','sha1'=>'foo','sha256'=>'foo')));
 	}
 	
 	public function testCoreInvalidPackage() {
@@ -57,7 +57,7 @@ class UpdateRunnerTest extends PHPUnit_Framework_TestCase {
 		
 		$ur = new UpdateRunner($this->phmock);
 
-		$this->assertEquals(UpdateRunner::FAIL_CHECKSUM, $ur->core(array('version'=>'1.0.0','sha1'=>'foo')));		
+		$this->assertEquals(UpdateRunner::FAIL_CHECKSUM, $ur->core(array('version'=>'1.0.0','sha1'=>'foo','sha256'=>'foo')));		
 	}
 	
 	public function testCoreValidPackage() {

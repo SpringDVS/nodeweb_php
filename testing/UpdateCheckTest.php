@@ -203,12 +203,12 @@ class UpdateCheckModuleTest extends PHPUnit_Framework_TestCase {
 	public function testUpdateCoreBehaviorNoUpdate() {
 	
 		$this->mhmock->method('getInfo')
-		->willReturn(array('module' => 'testpkg','version' => '0.5.0'));
+		->willReturn(array('module' => 'testpkg','version' => '0.9.0'));
 	
-		$this->vhmock->expects($this->once())->method('info')->willReturn(array('version' => '0.5.0'));
+		$this->vhmock->expects($this->once())->method('info')->willReturn(array('version' => '0.9.0'));
 		$this->vhmock->expects($this->once())->method('needsUpdate')->willReturn(false);
 	
-		$this->sdmock->expects($this->never())->method('delete');
+		//$this->sdmock->expects($this->never())->method('delete');
 		$this->sdmock->expects($this->never())->method('add');
 	
 		$check = new UpdateCheck($this->vhmock, $this->mhmock, $this->chmock, $this->sdmock);
@@ -221,14 +221,14 @@ class UpdateCheckModuleTest extends PHPUnit_Framework_TestCase {
 		$this->mhmock->method('getInfo')
 		->willReturn(array('module' => 'php.web.core','version' => '0.4.0'));
 		
-		$this->vhmock->expects($this->once())->method('info')->willReturn(array('version' => '0.5.0'));
+		$this->vhmock->expects($this->once())->method('info')->willReturn(array('version' => '0.9.0'));
 		$this->vhmock->expects($this->once())->method('needsUpdate')->willReturn(true);
 		
-		$this->sdmock->expects($this->once())->method('delete');
+		//$this->sdmock->expects($this->once())->method('delete');
 		$this->sdmock->expects($this->once())->method('add')->with(
 																$this->equalTo('core'),
 																$this->equalTo(array('php.web.core' => 
-																					array('version' => '0.5.0')
+																					array('version' => '0.9.0')
 																					
 																					)
 																				)

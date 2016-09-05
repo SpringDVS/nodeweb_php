@@ -157,6 +157,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 			'service' => $node->service(),
 			'state' => SpringDvs\NodeState::Disabled,
 			'role' => $node->role(),
+			'key' => $node->key()
 		);
 		
 		$this->geosubNetspace->set($node->spring(), $nodeArray);
@@ -229,6 +230,7 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 			'service' => $node->service(),
 			'priority' => SpringDvs\NodeState::Disabled,
 			'geosub' => $geosub,
+			'key' => $node->key()
 		);
 		
 		$this->geotopNetspace->set($key, $nodeArray);
@@ -318,7 +320,8 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 				$details['address'],
 				$details['service'],
 				$details['state'],
-				$details['role']
+				$details['role'],
+				$details['key']
 		);
 	}
 	
@@ -338,7 +341,8 @@ class NetspaceKvs implements SpringDvs\iNetspace {
 				$details['address'],
 				$details['service'],
 				SpringDvs\NodeState::Unspecified,
-				SpringDvs\NodeRole::Unknown
+				SpringDvs\NodeRole::Unknown,
+				$details['key']
 		);
 	}
 }
