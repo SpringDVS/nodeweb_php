@@ -84,7 +84,20 @@ class KeyringHandler implements IKeyring {
 		$result = $this->requestImport($armor);
 		$key = json_decode($result, true);
 
-		
+
+		// Check if we need to update a key we already have
+		$subject = $this->_keyring->get($key['keyid']);
+		if($subject) {
+			/* We have the key already so need to import
+			 * against the key in the keyring instead of
+			 * doing a straight import
+			 */
+			$result = $this->requestImport($armor, $subject['public']);
+			$key = json_decode($result, true);
+			$armor = $key['armor'];
+		}
+
+
 		$this->addKey($key, $armor);
 		$chk = $this->_keyring->get('this');
 		if($chk && $key['keyid'] == $chk['public']['keyid']) {
@@ -171,11 +184,15 @@ $email\n";
 		return $key['name'];
 	}
 	
-	private function requestImport($armor) {
+	private function requestImport($armor, $subject = null) {
 		$body = "IMPORT
 PUBLIC {
 $armor
 }\n";	
+
+		if($subject) {
+			$body .= "SUBJECT {\n$subject\n}\n";
+		}
 		return $this->request($body);
 	}
 	
