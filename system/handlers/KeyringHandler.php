@@ -1,6 +1,6 @@
 <?php
 use Flintstone\Flintstone;
-if(!defined('NODE_ADMIN') && !defined('NODE_KEYGEN')) die();
+if(!defined('NODE_ADMIN') && !defined('NODE_KEYGEN') && !defined('CERT_REQ')) die();
 
 class KeyringHandler implements IKeyring {
 	private $_keyring;
