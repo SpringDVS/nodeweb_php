@@ -69,7 +69,7 @@ class UpdateRunnerTest extends PHPUnit_Framework_TestCase {
 		
 		$ur = new UpdateRunner($this->phmock);
 		
-		$this->assertEquals(UpdateRunner::OK, $ur->core(array('version'=>'1.0.0','sha1'=>'foo')));		
+		$this->assertEquals(UpdateRunner::OK, $ur->core(array('version'=>'1.0.0','sha256'=>'foo')));		
 		
 	}
 }

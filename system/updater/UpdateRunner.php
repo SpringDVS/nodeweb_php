@@ -57,7 +57,7 @@ class UpdateRunner {
 	 */
 	public function core($info) {
 		$package  = "php.web.core_{$info['version']}.tgz";
-		$path = $this->pull($package, $info['sha1']);
+		$path = $this->pull($package, $info['sha256']);
 		
 		if($path == self::FAIL_DOWNLOAD || $path == self::FAIL_CHECKSUM) {
 			return $path;

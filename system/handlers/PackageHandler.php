@@ -22,7 +22,7 @@ class PackageHandler implements IPackageHandler {
 	 * 
 	 * @param string $repo The URI of the repository (assumes HTTP)
 	 */
-	public function __construct($repo = 'http://packages.spring-dvs.org') {
+	public function __construct($repo = 'https://packages.spring-dvs.org') {
 		$this->repo = $repo;
 	}
 	
