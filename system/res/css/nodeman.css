@@ -71,7 +71,8 @@ box-shadow: 0 0 10px #9c9c9c;
 div.white-container h3 {
     margin-top: 0px;
     width: 100%;
-    border-bottom: 2px solid #D3D5D5;
+    border-bottom: 0px solid #D3D5D5;
+    font-size: 0.8em;
 }
 div.update-block {
    margin-bottom: 15px; 
