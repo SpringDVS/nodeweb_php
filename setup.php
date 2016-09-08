@@ -137,7 +137,6 @@
 				return false;
 			} else {
 				$("#errors").text("");
-				$("#success").text("Form Valid");
 			}
 			
 			return true;
@@ -163,13 +162,17 @@
 		
 			$.post("?generate=true",postStr, function(data) {
 				if(data == "ok"){
-					alert("Generated config successfully");
-					$("#success").text("Generated Configuration");
+					$("#success").text("Generated Configuration! Please click next to set up keys.");
+					$('#generate-button').hide();
+					$('#next-button').show();
 				} else {
-					alert("Error writing config file!\nCheck permissions on directory");
-					
+					$("#errors").text("Error writing config file! Check permissions on directory.");
 				}
 			});
+		}
+
+		function next() {
+			window.location.href = "setupkeys.php";
 		}
 	</script>
 		
@@ -354,8 +357,8 @@
 					
 				</fieldset>
 				
-				<button onclick="generate()">Generate Configuration</button>
-				Note: This will overwrite any previous configuration
+				<button onclick="generate()" id="generate-button">Generate Configuration</button>
+				<button onclick="next()" style="display: none;" id="next-button">Next</button><br><br>
 				<div id="errors" style="color: #b94a48; font-weight: bold;">&nbsp;</div>
 				<div id="success" style="color: #1D5F12; font-weight: bold;"></div>
 			</div>

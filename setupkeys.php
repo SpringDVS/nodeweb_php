@@ -20,7 +20,7 @@ $generate = filter_input(INPUT_GET, 'generate');
 		
 		$handler->generateKey($name, $email, $passphrase);
 		
-		echo "ok ";
+		echo "ok";
 		return;
 	} else {
 		$body_content = setup_form();
@@ -67,13 +67,19 @@ $generate = filter_input(INPUT_GET, 'generate');
 			post = "email="+email+"&passphrase="+passphrase;
 			
 			$.post("?generate=true",post, function(data) {
-				if(data == "ok"){
-					$("#success").text("Generated Keys");
-					
+				if(data.trim() == "ok"){
+					$("#button-generate").hide();
+					$("#button-skip").hide();
+					$("#button-home").show();
+					$("#success").text("Generated Keys!");
 				} else {
-					$("#error").text("Error generated Keys");
+					$("#error").text("Error generating Keys. Please contact us (spring@care-connections.org)");
 				}
 			})
+		}
+
+		function gohome() {
+			window.location.href = "/node/";
 		}
 
 
@@ -116,7 +122,6 @@ $generate = filter_input(INPUT_GET, 'generate');
 				return false;
 			} else {
 				$("#errors").text("");
-				$("#success").text("Form Valid");
 				return true;
 			}
 		}
@@ -196,7 +201,9 @@ $generate = filter_input(INPUT_GET, 'generate');
 					<div class="pure-1-1">&nbsp;</div>
 				</fieldset>
 				
-				<button href="javascript:void(0);" onclick="RequestGeneration()">Generate Keys</button>
+				<button id="button-generate" href="javascript:void(0);" onclick="RequestGeneration()">Generate Keys</button>
+				<button id="button-home" href="javascript:void(0);" style="display: none;;" onclick="gohome()">Go to login</button>
+				<button id="button-skip" href="javascript:void(0);" style="float: right;" onclick="gohome()">Skip</button>
 				<div style="margin-top: 10px;">
 					<strong>Note:</strong> This process may take a minute
 				</div>
