@@ -10,7 +10,7 @@ class KeyringHandler implements IKeyring {
 
 		$options['dir'] = SpringDvs\Config::$sys['store_live'];
 		$this->_keyring = new Flintstone('keyring', $options);
-		$this->_remote = "127.0.0.1:55500";
+		$this->_remote = "https://pkserv.spring-dvs.org";
 	}
 
 	public function getNodePublicKey() {
@@ -133,7 +133,7 @@ $private
 		if($public == $obj['public']) {
 			return false;
 		}
-
+		usleep(250000);
 		$this->importPublicKey($obj['public']);
 
 		return true;
@@ -163,11 +163,11 @@ $email\n";
 		//curl_setopt($ch, CURLOPT_URL,            $address);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt($ch, CURLOPT_POST,           1 );
-		curl_setopt($ch, CURLOPT_USERAGENT,      "WebSpringDvs" );
+		curl_setopt($ch, CURLOPT_USERAGENT,      "WebSpringDvs/0.9" );
 		curl_setopt($ch, CURLOPT_POSTFIELDS,      $body);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_HTTPHEADER,     array(
-				'User-Agent: WebSpringDvs/0.2'));
+				'User-Agent: WebSpringDvs/0.9'));
 		$response = curl_exec($ch);
 		
 		if($response === false) {
