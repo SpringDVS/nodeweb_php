@@ -147,3 +147,25 @@ $("#keyring-menu").click(function() {
 		$(".keyring-sub").hide();		
 	}
 })
+
+function getSetupFileStatus() {
+	$.getJSON('/node/api/remsetup/get/',
+		function(data) {
+			if(data.result == 'yes') {
+				$('#setup-file-warning').show();
+			} else {
+				$('#setup-file-warning').hide();
+			}
+		}
+	);
+}
+
+function remSetupFiles() {
+	$.get('/node/api/remsetup/post/',
+			function(data) {
+				getSetupFileStatus();
+			}
+		);	
+}
+
+getSetupFileStatus();

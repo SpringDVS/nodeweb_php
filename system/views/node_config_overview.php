@@ -1,34 +1,6 @@
 <section>
 	
 <div class="pure-u-3-5">
-	
-	<div class="white-container raised">
-		<h3>Network Services</h3>
-		Various services that your node exposes on the Spring network.
-		<table class="pure-table pure-table-striped" style="margin-top: 10px;">
-			<tbody data-bind="foreach: nwservices">
-				<tr>
-					<td style="font-weight: bold;" data-bind="text: title"></td>
-					<td data-bind="text: description"></td>
-					<td> <a style="text-decoration: none;" data-bind="attr: {'href':'/node/service/network/'+module+'/'}">Config</a></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	
-	<div class="white-container raised">
-		<h3>Gateway Services</h3>
-		Providing public facing services through the node.
-		<table class="pure-table pure-table-striped" style="margin-top: 10px;">
-			<tbody data-bind="foreach: gwservices">
-				<tr>
-					<td style="font-weight: bold;" data-bind="text: title"></td>
-					<td data-bind="text: description"></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	
 	<div class="white-container raised">
 		<h3>Updates</h3>
 		
@@ -46,7 +18,15 @@
 		<button id="updater" onclick="ManOverviewController.performUpdate()">Update</button>
 		<div id="update-msg"></div>
 	</div>
-</div>
+	
+	<div id="setup-file-warning" style="display: hidden;" class="white-container raised">
+		<h3>Setup Files</h3>
+		
+		<strong>Setup files exist on this server -- please click button to remove them.</strong>
+		<button onclick="remSetupFiles()" style="margin-top: 10px;">Remove Setup Files</button>
+	</div>
+
+</div> <!--  u-3-5 -->
 
 <div class="pure-u-2-5">
 	<div class="pure-1-1">
@@ -114,7 +94,7 @@
 		<br>
 		<button href="javascript:void(0);" onclick="location.href='/node/logout/';">Logout</button></div>	
 	</div>
-</div>
+</div><!--  u-2-5 -->
 	
 </section>
 

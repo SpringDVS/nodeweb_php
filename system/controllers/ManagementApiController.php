@@ -198,6 +198,38 @@ class ManagementApiController {
 	}
 	
 	/**
+	 * Request deletion of setup files
+	 * 
+	 *  This cannot be used through remote API
+	 */
+	private function remsetupPost() {
+		if(!defined('NODE_LOCAL')) return "{}";
+		$files = array('setup.php', 'setupkeys.php');
+		foreach($files as $file) {
+			if(file_exists($file)) {
+				unlink($file);
+			}
+		}
+	}
+
+	/**
+	 * Check if setup files exist
+	 *
+	 *  This cannot be used through remote API
+	 */
+	private function remsetupGet() {
+		if(!defined('NODE_LOCAL')) return "{}";
+		$files = array('setup.php', 'setupkeys.php');
+		foreach($files as $file) {
+			if(file_exists($file)) {
+				return json_encode(array('result' => 'yes'));
+			}
+		}
+		
+		return json_encode(array('result' => 'no'));
+	}
+	
+	/**
 	 * Get list of gateway services
 	 */
 	private function gwservicesGet() {
