@@ -151,3 +151,9 @@ Flight::route('/gateway/@service/*', function($service, $route) {
 }, true);
 
 
+Flight::route('/', function() {
+	
+	// This is the gateway interface for the node
+	Flight::redirect("/node/");
+	
+}, true);
