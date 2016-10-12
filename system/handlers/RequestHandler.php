@@ -49,7 +49,7 @@ class RequestHandler {
 			return "122"; // Unsupported service
 		}
 		
-		$response = include "$path";
+		$response = include $path;
 		$info = include "$ipath";
 		$node = \SpringDvs\nodeurl_from_config();
 		
