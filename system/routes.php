@@ -12,6 +12,8 @@ Flight::register('gatewayApi', 'GatewayApiController');
 
 /**
  * These are the node management routes
+ * 
+ * ToDO: This code is HORRIBLE
  */
 Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $zone, $method, $service, $route) {
 	
@@ -61,6 +63,8 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 
 	$updater->check(CHK_UPDATE_MODULES|CHK_UPDATE_CORE);
 	$subTitle = "";
+	$vars = array();
+
 	switch($area) {
 	case 'api':
 		$api = Flight::manApi();
@@ -108,9 +112,11 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 		break;
 		
 	default:
+		$keyring = new KeyringHandler();
+		$vars['hasCertificate'] = $keyring->getNodePublicKey() != ""; 
 		$subTitle = "Overview";
 		$scriptsTop[] = "api_man_overview.js";
-		Flight::render('node_config_overview', null, 'body_content');
+		Flight::render('node_config_overview', array('vars' => $vars), 'body_content');
 	}
 	
 	
@@ -119,6 +125,7 @@ Flight::route('/node/(@area/(@action/(@method(/@service))))', function($area, $z
 										'subtitle' => $subTitle,
 										'scriptsTop' => $scriptsTop,
 										'scriptsBottom' => $scriptsBottom,
+										'vars' => $vars,
 										'services' => array(
 												'bulletin' => 'Bulletin',
 												'orgprofile' => 'Profile',

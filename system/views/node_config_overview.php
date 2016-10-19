@@ -77,9 +77,16 @@
 			</tr>
 		</tbody>
 		</table>
-		
-		<button id="action-status-update" style="margin-top: 10px;">Bring Online</button>
-		<button id="action-register" style="margin-top: 10px;">Register</button>
+		<?php if($vars['hasCertificate']): ?>
+			<button id="action-status-update" style="margin-top: 10px;">Bring Online</button>
+			<button id="action-register" style="margin-top: 10px;">Register</button>
+		<?php else: ?>
+			 
+			 <span style="color: red; font-weight: bold;"><br>Node has no certificate</span><br>
+			 Please go to <a href="/node/keyring/cert/">Keyring</a> to generate one.
+			<button id="action-status-update" style="margin-top: 10px; display: none;">Bring Online</button>
+			<button id="action-register" style="margin-top: 10px; display: none;">Register</button>
+		<?php endif; ?>
 		<div id="action-error" style="color: #e9322d; font-weight: bold; margin-top:10px;"></div>
 	</div>
 	<div class="white-container raised">

@@ -10,7 +10,7 @@ class KeyringHandler implements IKeyring {
 
 		$options['dir'] = SpringDvs\Config::$sys['store_live'];
 		$this->_keyring = new Flintstone('keyring', $options);
-		$this->_remote = "https://pkserv.spring-dvs.org";
+		$this->_remote = "https://pkserv.spring-dvs.org/process";
 	}
 
 	public function getNodePublicKey() {

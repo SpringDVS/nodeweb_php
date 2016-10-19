@@ -30,7 +30,8 @@ class ServiceController {
 			'title' => $title,
 			'content' => filter_input(INPUT_POST, 'content'),
 			'uid' => $uid,
-			'tags' => filter_input(INPUT_POST, 'tags')
+			'tags' => filter_input(INPUT_POST, 'tags'),
+			'categories' => filter_input(INPUT_POST, 'categories')
 		];
 
 		$this->db->set((int)(time()/10), $input);
@@ -49,6 +50,11 @@ class ServiceController {
 		
 		foreach($bulletins as $key => $val) {
 			$tmp = ['key' => $key];
+			
+			if(!isset($val['categories'])) {
+				$tmp['categories'] = "";
+			}
+
 			$tmp = array_merge($tmp, $val);
 			$out[] = $tmp;
 		}

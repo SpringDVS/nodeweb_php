@@ -28,6 +28,7 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 				<tr>
 					<td style="font-size: 12px; border-top: 1px solid #D3D5D5;border-bottom: 1px solid #D3D5D5;">
 						<span data-bind="text: tags"></span>
+						| <span data-bind="text: categories"></span>
 						<span style="font-size: 12px; float: right;" colspan="2" data-bind="text: uid"></span>
 					</td>
 				</tr>
@@ -48,7 +49,9 @@ if(!defined('NODE_ADMIN')) die("Platform Error");
 				<label for="bf-tags">Tags</label>
 				<input id="bf-tags" type="text" style="width:60%;" placeholder="tag1,tag2,tag3">
 				<small>Separate with commas</small>
-
+				<label for="bf-categories">Categories</label>
+				<input id="bf-categories" type="text" style="width:60%;" placeholder="Category1,Category2">
+				<small>Separate with commas</small>
 			</fieldset>
 		</form>
 		<button onclick="buForm.send()">Add</button>

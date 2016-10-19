@@ -30,10 +30,10 @@ if(isset($rpath[0]) && $rpath[0] == "pull") {
 
 if(isset($rpath[0]) && $rpath[0] == "pullreq") {
 
-	if(!isset($queries['from'])) {
+	if(!isset($queries['source'])) {
 		return array('result' => 'error');
 	}
-	$nodes = GatewayHandler::resolveUri("spring://{$queries['from']}");
+	$nodes = GatewayHandler::resolveUri("spring://{$queries['source']}");
 	if($nodes === false) {
 		return array('result' => 'error');
 	}

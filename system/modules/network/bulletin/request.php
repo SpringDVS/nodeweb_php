@@ -25,6 +25,25 @@ if(isset($rpath[0]) && !empty($rpath[0])) {
 
 parse_str($url->query(), $queries);
 $bulletins = array_reverse($bulletins);
+
+if(isset($queries['categories'])) {
+	$qcats = explode(',', $queries['categories']);
+	$filtered = array();
+	foreach($bulletins as $key => &$value) {
+		if(!isset($value['categories'])) {
+			continue;
+		}
+		$cats = explode(',', $value['categories']);
+		foreach($cats as $cat) {
+			if(in_array(trim($cat), $qcats)) {
+				$filtered[$key] = $value;
+			}
+		}
+	}
+	
+	$bulletins = $filtered;
+}
+
 if(isset($queries['tags'])) {
 
 	$qtags = explode(',', $queries['tags']);
